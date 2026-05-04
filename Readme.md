@@ -3,7 +3,7 @@
 ## Quick Navigation
 
 - [Summary](#summary)
-- [Start Here](#start-here)
+- [Start Here](#start-here), [Example](#project-usage-example)
 - [Install](#install)
 - Development: [Agentic Workflow](#agentic-workflow), [Repo Requirements](#repo-requirements), [Verification](#verification)
 - How to use: [Package README](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi/README.md)
@@ -18,6 +18,13 @@ This repository hosts development environment and samples for the underlying pac
 1. Next [Install](#install)
 2. Fluent API documentation: [Packages/com.studentutu.fluentplayableapi/README.md](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi/README.md)
 3. Embedded package(see [Install](#install)): [Packages/com.studentutu.fluentplayableapi](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi)
+
+### Project usage example
+
+See SampleScene and FluentPlayableApi\Assets\Scripts\AnimationGraphExample.cs for the use of Fluent Playable API.
+
+More in-depth examples see in package: [Package README](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi/README.md)
+
 
 ## Install
 
