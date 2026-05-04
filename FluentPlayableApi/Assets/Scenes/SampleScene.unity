@@ -127,6 +127,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 501351451}
     m_Modifications:
+    - target: {fileID: 3286025266249481783, guid: df0042ef01246c940885b85be8944be7, type: 3}
+      propertyPath: m_ApplyRootMotion
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8084439523428122359, guid: df0042ef01246c940885b85be8944be7, type: 3}
       propertyPath: m_Name
       value: Robot Kyle
@@ -504,6 +508,7 @@ MonoBehaviour:
   UpperBody:
   - {fileID: 474731757414567770, guid: 8a1077455951bdf4b9c0acdc8b9250fd, type: 3}
   - {fileID: 1511234772771085417, guid: 2e50cf0529cab3e429d7ada41765c2ec, type: 3}
+  UpperBodyMask: {fileID: 31900000, guid: d14d611b2e68a424b8399b2f00e778d4, type: 2}
   _animator: {fileID: 207823916}
   ManualTime: 0
   Manual: 0

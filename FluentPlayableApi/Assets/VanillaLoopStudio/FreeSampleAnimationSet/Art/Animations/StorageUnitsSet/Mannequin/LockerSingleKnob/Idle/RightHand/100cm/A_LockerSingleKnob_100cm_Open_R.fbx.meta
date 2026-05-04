@@ -1,7 +1,14 @@
 fileFormatVersion: 2
 guid: 8a1077455951bdf4b9c0acdc8b9250fd
+AssetOrigin:
+  serializedVersion: 1
+  productId: 321560
+  packageName: Free Sample Animation Set
+  packageVersion: 1.0
+  assetPath: Assets/VanillaLoopStudio/FreeSampleAnimationSet/Art/Animations/StorageUnitsSet/Mannequin/LockerSingleKnob/Idle/RightHand/100cm/A_LockerSingleKnob_100cm_Open_R.fbx
+  uploadId: 835894
 ModelImporter:
-  serializedVersion: 22200
+  serializedVersion: 24200
   internalIDToNameTable: []
   externalObjects: {}
   materials:
@@ -17,7 +24,11 @@ ModelImporter:
     removeConstantScaleCurves: 0
     motionNodeName: 
     animationImportErrors: 
-    animationImportWarnings: 
+    animationImportWarnings: "\nClip 'A_LockerSingleKnob_100cm_Open_R' has import
+      animation warnings that might lower retargeting quality:\n\t'spine_03' is inbetween
+      humanoid transforms and has rotation animation that will be discarded.\n\t'spine_05'
+      is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'neck_02'
+      is inbetween humanoid transforms and has rotation animation that will be discarded.\n"
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
@@ -29,7 +40,36 @@ ModelImporter:
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
-    clipAnimations: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: A_LockerSingleKnob_100cm_Open_R
+      takeName: A_LockerSingleKnob_100cm_Open_R
+      internalID: 474731757414567770
+      firstFrame: 0
+      lastFrame: 60
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
     isReadable: 0
   meshes:
     lODScreenPercentages: []
@@ -56,6 +96,9 @@ ModelImporter:
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
     optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
@@ -595,8 +638,7 @@ ModelImporter:
     - name: index_02_l
       parentName: index_01_l
       position: {x: -0.040799998, y: 1.4210854e-16, z: -9.592326e-16}
-      rotation: {x: -0.000000073366806, y: 0.000000042324626, z: 0.00000006817565,
-        w: 1}
+      rotation: {x: -0.000000073366806, y: 0.000000042324626, z: 0.00000006817565, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: index_03_l
       parentName: index_02_l
@@ -651,8 +693,7 @@ ModelImporter:
     - name: pinky_02_l
       parentName: pinky_01_l
       position: {x: -0.03816, y: 1.7053025e-15, z: 5.684342e-16}
-      rotation: {x: 0.000000014566059, y: -0.000000018559517, z: -0.00000012595555,
-        w: 1}
+      rotation: {x: 0.000000014566059, y: -0.000000018559517, z: -0.00000012595555, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: pinky_03_l
       parentName: pinky_02_l
@@ -672,8 +713,7 @@ ModelImporter:
     - name: ring_02_l
       parentName: ring_01_l
       position: {x: -0.04977, y: -8.5265126e-16, z: -9.592326e-16}
-      rotation: {x: -0.000000014860028, y: -0.000000060546526, z: 0.000000010434387,
-        w: 1}
+      rotation: {x: -0.000000014860028, y: -0.000000060546526, z: 0.000000010434387, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: ring_03_l
       parentName: ring_02_l
@@ -733,8 +773,7 @@ ModelImporter:
     - name: pinky_02_r
       parentName: pinky_01_r
       position: {x: 0.03816036, y: 0.00000030366024, z: 0.00000032629205}
-      rotation: {x: 0.000000014566073, y: -0.000000018560069, z: -0.00000012595548,
-        w: 1}
+      rotation: {x: 0.000000014566073, y: -0.000000018560069, z: -0.00000012595548, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: pinky_03_r
       parentName: pinky_02_r
@@ -794,8 +833,7 @@ ModelImporter:
     - name: index_02_r
       parentName: index_01_r
       position: {x: 0.040799327, y: 0.000000050402058, z: 0.0000003210666}
-      rotation: {x: -0.00000001467336, y: 0.000000042324572, z: 0.000000068175666,
-        w: 1}
+      rotation: {x: -0.00000001467336, y: 0.000000042324572, z: 0.000000068175666, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: index_03_r
       parentName: index_02_r
@@ -964,8 +1002,7 @@ ModelImporter:
     hasTranslationDoF: 1
     hasExtraRoot: 0
     skeletonHasParents: 1
-  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: a75f8b9fe0212a043acbb8fa497181ca,
-    type: 3}
+  lastHumanDescriptionAvatarSource: {fileID: 9000000, guid: a75f8b9fe0212a043acbb8fa497181ca, type: 3}
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 3
   humanoidOversampling: 1
@@ -977,10 +1014,3 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 321560
-  packageName: Free Sample Animation Set
-  packageVersion: 1.0
-  assetPath: Assets/VanillaLoopStudio/FreeSampleAnimationSet/Art/Animations/StorageUnitsSet/Mannequin/LockerSingleKnob/Idle/RightHand/100cm/A_LockerSingleKnob_100cm_Open_R.fbx
-  uploadId: 835894
