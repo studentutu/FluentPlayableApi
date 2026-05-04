@@ -32,8 +32,8 @@ This repository hosts development environment and samples for the underlying pac
 
 ### Project usage example
 
-See SampleScene and FluentPlayableApi\Assets\Scripts\AnimationGraphExample.cs for the use of Fluent Playable API.
-Use PlayableGraphMonitor to view the graph and individual connections.
+See SampleScene and [AnimationGraphExample.cs](/FluentPlayableApi\Assets\Scripts\AnimationGraphExample.cs) for the use of Fluent Playable API.
+Use ![PlayableGraphMonitor](https://github.com/SolarianZ/UnityPlayableGraphMonitorTool) (Window -> Analysis -> PlayableGraphMonitor) to view the graph and individual connections.
 
 More in-depth examples see in package: [Package README](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi/README.md)
 
