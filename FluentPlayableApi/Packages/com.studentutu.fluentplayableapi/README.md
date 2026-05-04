@@ -5,8 +5,8 @@
 - [Summary](#summary)
 - [Install](#install)
 - [How to use](#core-use), [Example](#multi-output-example)
-- [Fluent API](#fluent-api), [Custom Extension](#project-extensions)
-- [Verification](#validation)
+- [Fluent API](#fluent-api), [Project Extensions](#project-extensions)
+- [Validation](#validation)
 - [License](#license)
 
 ## Summary
@@ -15,15 +15,18 @@ Fluent Playable API is a compact declaration layer over Unity's `PlayableGraph`.
 It helps create, connect, name, resolve, and validate Unity playables while still
 returning a normal Unity `PlayableGraph`.
 
-It solves authoring topology issue, where Unity provides flat view, Fluent API provides visibility and maintainability.
+It addresses a graph authoring problem: Unity provides a flat view, while Fluent
+Playable API keeps topology visible and maintainable in code.
 
 The API is intentionally small. It does not replace Unity's graph types, own
 graph lifetime, or add project-specific animation concepts.
 
-
 ## Install
 
-The distributable Unity package lives at [Packages/com.studentutu.fluentplayableapi](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi). If you only need the package in another project, install that package path directly instead of copying repo files by hand.
+The distributable Unity package lives in this repository at
+`FluentPlayableApi/Packages/com.studentutu.fluentplayableapi`. If you only need
+the package in another project, install that package path directly instead of
+copying repository files by hand.
 
 ### Install as Git dependency via Package Manager
 
@@ -60,7 +63,6 @@ If this repository is already checked out next to your Unity project, you can po
 
 Replace `../path-to-cloned-repo` with the actual relative path from your Unity project's `Packages/manifest.json` file to this repository clone.
 
-
 ## Core Use
 
 ```csharp
@@ -69,7 +71,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-// 1. Authoring topology
+// 1. Author the topology.
 PlayableGraph graph = FluentBuilder.Create("CharacterGraph")
   .Output(animator, out AnimationPlayableOutput output)
 
@@ -86,7 +88,7 @@ PlayableGraph graph = FluentBuilder.Create("CharacterGraph")
 
   .Build();
 
-// 2. Linking to custom animation classes.
+// 2. Link custom animation classes to fluent metadata.
 AnimationMixerPlayable resolvedRoot = graph.Resolve<AnimationMixerPlayable>("RootMixer");
 int baseClipInput = graph.InputIndex("RootMixer", "BaseClip");
 ```
@@ -152,7 +154,8 @@ set when a source needs multiple output ports:
 
 ### Clips
 
-`WithClip(...)` creates an `AnimationClipPlayable` and applies safe defaults:
+`WithClip(...)` creates an `AnimationClipPlayable`, disables foot IK, and pauses
+the playable by default:
 
 ```csharp
 clipPlayable.SetApplyFootIK(false);
@@ -366,7 +369,7 @@ FluentBuilder.Create(existingGraph)
   .WithPlayable(additivePlayable, sourceOutputPort: 0)
   .WithWeight(applyAdditive, "AdditivePose", 1f)
 
-  .Build(play: false);// validation here
+  .Build(play: false); // validation here
 ```
 
 ## License
