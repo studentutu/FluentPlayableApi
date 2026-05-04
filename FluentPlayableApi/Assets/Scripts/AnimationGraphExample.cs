@@ -12,6 +12,7 @@ public class AnimationGraphExample : MonoBehaviour
     [SerializeField] private AnimationClip Locomotion;
     [SerializeField] private List<AnimationClip> FullBody;
     [SerializeField] private List<AnimationClip> UpperBody;
+    [SerializeField] private AvatarMask UpperBodyMask;
     [SerializeField] private Animator _animator;
 
     public float ManualTime;
@@ -36,8 +37,9 @@ public class AnimationGraphExample : MonoBehaviour
         
         // TODO: Sample of Fluent API to create graph:
         // 1. Locomotion (Clip) -> RootWithLocomotionMixer [0] -> RootWithFullBodyMixer [0] -> Output [0]
-        // 2. UpperBodySlot (Mixer of clips) -> RootWithLocomotionMixer [1]
+        // 2. UpperBodySlot (Mixer of clips) -> RootWithLocomotionMixer [1] (Additively with UpperBodyMask!)
         // 3. FullBodySlot (Mixer of clips) -> RootWithFullBodyMixer[1]
+        // 4. Random clip is enabled on UpperBodySlot
     }
 
     private void OnDestroy()
