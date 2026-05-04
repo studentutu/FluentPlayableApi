@@ -198,6 +198,28 @@ namespace Studentutu.Fluentplayableapi.Tests
             }
         }
 
+        [Test]
+        public void ClipPausedParameterControlsInitialPlayState()
+        {
+            FluentBuilder builder = FluentBuilder.Create("ClipStateGraph");
+
+            try
+            {
+                builder.WithClip(new AnimationClip(), out AnimationClipPlayable pausedClip);
+                builder.WithClip(new AnimationClip(), out AnimationClipPlayable playingClip, paused: false);
+
+                Assert.AreEqual(PlayState.Paused, pausedClip.GetPlayState());
+                Assert.AreEqual(PlayState.Playing, playingClip.GetPlayState());
+            }
+            finally
+            {
+                if (builder.Graph.IsValid())
+                {
+                    builder.Graph.Destroy();
+                }
+            }
+        }
+
         private static GameObject CreateAnimatorObject(out Animator animator)
         {
             var animatorObject = new GameObject("FluentBuilderTestsAnimator");

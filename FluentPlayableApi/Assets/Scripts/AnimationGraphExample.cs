@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Studentutu.Fluentplayableapi;
 using UnityEngine;
@@ -30,6 +31,11 @@ public class AnimationGraphExample : MonoBehaviour
         Recreate();
     }
 
+    private void OnEnable()
+    {
+        Recreate();
+    }
+
     // Update is called once per frame
     private void Recreate()
     {
@@ -52,7 +58,7 @@ public class AnimationGraphExample : MonoBehaviour
             .WithWeight(rootWithFullBodyMixer, "LocomotionRoot", 1f)
 
             .Input(rootWithLocomotionMixer, 0, "Locomotion")
-            .WithClip(Locomotion, out _, "Locomotion")
+            .WithClip(Locomotion, out _, "Locomotion", paused: false)
             .WithWeight(rootWithLocomotionMixer, "Locomotion", 1f)
 
             .Input(rootWithLocomotionMixer, 1, "UpperBodySlot")
@@ -138,7 +144,7 @@ public class AnimationGraphExample : MonoBehaviour
 
             string inputName = slotName + input;
             builder.Input(slot, input, inputName)
-                .WithClip(clip, out _, inputName + "Clip")
+                .WithClip(clip, out _, inputName + "Clip", paused: input != enabledInput)
                 .WithWeight(slot, inputName, input == enabledInput ? 1f : 0f);
 
             input++;

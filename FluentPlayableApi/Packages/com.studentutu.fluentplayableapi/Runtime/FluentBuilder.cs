@@ -122,7 +122,7 @@ namespace Studentutu.Fluentplayableapi
         /// <summary>
         /// Creates and optionally registers an animation clip playable with safe defaults.
         /// </summary>
-        public FluentBuilder WithClip(AnimationClip clip, out AnimationClipPlayable playable, string? name = null)
+        public FluentBuilder WithClip(AnimationClip clip, out AnimationClipPlayable playable, string? name = null, bool paused = true)
         {
             if (clip == null)
             {
@@ -132,7 +132,15 @@ namespace Studentutu.Fluentplayableapi
             playable = AnimationClipPlayable.Create(Graph, clip);
             playable.SetOutputCount(1);
             playable.SetApplyFootIK(false);
-            playable.Pause();
+            if (paused)
+            {
+                playable.Pause();
+            }
+            else
+            {
+                playable.Play();
+            }
+
             RegisterAndAttachCreatedPlayable(playable, name, null);
             return this;
         }

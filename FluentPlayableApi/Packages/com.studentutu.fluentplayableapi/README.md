@@ -59,7 +59,7 @@ outputs, assume an existing output, or own graph destruction.
 .AddInput(playable, name, out index)
 
 .WithMixer<TMixer>(inputCount, out mixer, name = null, outputCount = 1)
-.WithClip(clip, out clipPlayable, name = null)
+.WithClip(clip, out clipPlayable, name = null, paused = true)
 .WithScript<TBehaviour>(out script, inputCount = 0, outputCount = 1, name = null)
 .WithPlayable(factory, out playable, name = null)
 .WithPlayable<TPlayable>(key, out playable, sourceOutputPort = 0)
@@ -101,6 +101,12 @@ set when a source needs multiple output ports:
 ```csharp
 clipPlayable.SetApplyFootIK(false);
 clipPlayable.Pause();
+```
+
+Pass `paused: false` to start an individual clip playable in the playing state:
+
+```csharp
+.WithClip(runClip, out var runPlayable, name: "Run", paused: false)
 ```
 
 Project-specific clip configuration, such as speed or duration behavior, should

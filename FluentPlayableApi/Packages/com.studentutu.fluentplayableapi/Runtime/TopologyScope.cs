@@ -83,9 +83,9 @@ namespace Studentutu.Fluentplayableapi
         /// <summary>
         /// Creates and registers an animation clip playable under this scope.
         /// </summary>
-        public TopologyScope WithClip(AnimationClip clip, out AnimationClipPlayable playable, string? name = null)
+        public TopologyScope WithClip(AnimationClip clip, out AnimationClipPlayable playable, string? name = null, bool paused = true)
         {
-            _builder.WithClip(clip, out playable, null);
+            _builder.WithClip(clip, out playable, null, paused);
             if (name != null)
             {
                 _builder.RegisterAndAttachCreatedPlayable(playable, name, Path);
