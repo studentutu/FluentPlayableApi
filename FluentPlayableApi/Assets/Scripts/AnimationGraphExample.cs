@@ -46,26 +46,27 @@ public class AnimationGraphExample : MonoBehaviour
         
         if (Locomotion == null)
             return;
-
+        
+        // Same PlayableGraph under the hood.
         var builder = FluentBuilder.Create("AnimationGraphExample")
             .Output(_animator, out var output)
             .Input(output)
             .WithMixer<AnimationMixerPlayable>(2, out var rootWithFullBodyMixer, "RootWithFullBodyMixer")
             .WithWeight(output, 1f)
-
+            
             .Input(rootWithFullBodyMixer, 0, "LocomotionRoot")
             .WithMixer<AnimationLayerMixerPlayable>(2, out var rootWithLocomotionMixer, "RootWithLocomotionMixer")
             .WithWeight(rootWithFullBodyMixer, "LocomotionRoot", 1f)
 
-            .Input(rootWithLocomotionMixer, 0, "Locomotion")
-            .WithClip(Locomotion, out _, "Locomotion", paused: false)
-            .WithWeight(rootWithLocomotionMixer, "Locomotion", 1f)
+                .Input(rootWithLocomotionMixer, 0, "Locomotion")
+                .WithClip(Locomotion, out _, "Locomotion", paused: false)
+                .WithWeight(rootWithLocomotionMixer, "Locomotion", 1f)
 
-            .Input(rootWithLocomotionMixer, 1, "UpperBodySlot")
-            .WithMixer<AnimationMixerPlayable>(CountValidClips(UpperBody), out var upperBodySlot, "UpperBodySlot")
-            .WithWeight(rootWithLocomotionMixer, "UpperBodySlot", 1f)
-            .Layer(rootWithLocomotionMixer, 0)
-            .Layer(rootWithLocomotionMixer, 1, additive: true, mask: UpperBodyMask)
+                .Input(rootWithLocomotionMixer, 1, "UpperBodySlot")
+                .WithMixer<AnimationMixerPlayable>(CountValidClips(UpperBody), out var upperBodySlot, "UpperBodySlot")
+                .WithWeight(rootWithLocomotionMixer, "UpperBodySlot", 1f)
+                .Layer(rootWithLocomotionMixer, 0)
+                .Layer(rootWithLocomotionMixer, 1, additive: true, mask: UpperBodyMask)
 
             .Input(rootWithFullBodyMixer, 1, "FullBodySlot")
             .WithMixer<AnimationMixerPlayable>(CountValidClips(FullBody), out var fullBodySlot, "FullBodySlot")
@@ -74,7 +75,7 @@ public class AnimationGraphExample : MonoBehaviour
         AddClipsToSlot(builder, upperBodySlot, UpperBody, "UpperBody", PickRandomValidClipIndex(UpperBody));
         AddClipsToSlot(builder, fullBodySlot, FullBody, "FullBody", enabledInput: -1);
 
-        _graph = builder.Build(play: !Manual);
+        _graph = builder.Build(play: !Manual); // validates here.
     }
 
     private void OnDestroy()

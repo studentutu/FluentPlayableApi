@@ -1,11 +1,65 @@
 # Fluent Playable API
 
+## Quick Navigation
+
+- [Summary](#summary)
+- [Install](#install)
+- [How to use](#core-use), [Example](#multi-output-example)
+- [Fluent API](#fluent-api), [Custom Extension](#project-extensions)
+- [Verification](#validation)
+- [License](#license)
+
+## Summary
+
 Fluent Playable API is a compact declaration layer over Unity's `PlayableGraph`.
 It helps create, connect, name, resolve, and validate Unity playables while still
 returning a normal Unity `PlayableGraph`.
 
+It solves authoring topology issue, where Unity provides flat view, Fluent API provides visibility and maintainability.
+
 The API is intentionally small. It does not replace Unity's graph types, own
 graph lifetime, or add project-specific animation concepts.
+
+
+## Install
+
+The distributable Unity package lives at [Packages/com.studentutu.fluentplayableapi](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi). If you only need the package in another project, install that package path directly instead of copying repo files by hand.
+
+### Install as Git dependency via Package Manager
+
+1. Open Package Manager in Unity (`Window -> Package Manager`).
+2. Click `+` in the top-left corner.
+3. Select `Add package from git URL...`.
+4. Enter the following URL and click `Add`:
+
+```text
+https://github.com/studentutu/FluentPlayableApi.git?path=/FluentPlayableApi/Packages/com.studentutu.fluentplayableapi
+```
+
+> NOTE: If you want to pin the install, append `#branch`, `#tag`, or a commit SHA. Do not assume repo tags map cleanly to `package.json` versions.
+
+### Install by editing `Packages/manifest.json`
+
+1. Close Unity if it is holding the manifest open.
+2. Open `Packages/manifest.json`.
+3. Add the package entry under `"dependencies"`:
+
+```json
+"com.studentutu.fluentplayableapi": "https://github.com/studentutu/FluentPlayableApi.git?path=/FluentPlayableApi/Packages/com.studentutu.fluentplayableapi"
+```
+
+4. Reopen the project in Unity and let Package Manager resolve the dependency.
+
+### Install from local disk
+
+If this repository is already checked out next to your Unity project, you can point `manifest.json` to the package folder directly:
+
+```json
+"com.studentutu.fluentplayableapi": "file:../path-to-cloned-repo/FluentPlayableApi/Packages/com.studentutu.fluentplayableapi"
+```
+
+Replace `../path-to-cloned-repo` with the actual relative path from your Unity project's `Packages/manifest.json` file to this repository clone.
+
 
 ## Core Use
 
@@ -15,6 +69,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
+// 1. Authoring topology
 PlayableGraph graph = FluentBuilder.Create("CharacterGraph")
   .Output(animator, out AnimationPlayableOutput output)
 
@@ -31,11 +86,12 @@ PlayableGraph graph = FluentBuilder.Create("CharacterGraph")
 
   .Build();
 
+// 2. Linking to custom animation classes.
 AnimationMixerPlayable resolvedRoot = graph.Resolve<AnimationMixerPlayable>("RootMixer");
 int baseClipInput = graph.InputIndex("RootMixer", "BaseClip");
 ```
 
-## Entry Points
+### Entry Points
 
 ```csharp
 FluentBuilder.Create("Name of graph")
@@ -73,10 +129,10 @@ outputs, assume an existing output, or own graph destruction.
 
 .CompileAs(playable)
 
-.Build(play = true)
+.Build(play = true) // validation here
 ```
 
-## Mixers
+### Mixers
 
 `WithMixer<TMixer>(...)` supports:
 
@@ -94,7 +150,7 @@ set when a source needs multiple output ports:
   outputCount: 2)
 ```
 
-## Clips
+### Clips
 
 `WithClip(...)` creates an `AnimationClipPlayable` and applies safe defaults:
 
@@ -112,7 +168,7 @@ Pass `paused: false` to start an individual clip playable in the playing state:
 Project-specific clip configuration, such as speed or duration behavior, should
 be applied by project code after creation.
 
-## Arbitrary Playables
+### Arbitrary Playables
 
 Use the factory overload for Unity playables that are outside the core mixer and
 clip helpers:
@@ -138,7 +194,7 @@ an edge:
 .WithPlayable<AnimationMixerPlayable>("Character/Locomotion", out var locomotion)
 ```
 
-## Scopes And Lookup
+### Scopes And Lookup
 
 `Scope(path)` creates a virtual declaration context. Nodes declared inside a
 scope are registered below that path:
@@ -173,7 +229,7 @@ Path rules:
 - Typed lookup throws when the registered playable type does not match.
 - `.` and `..` path segments are rejected.
 
-## Inputs And Connections
+### Inputs And Connections
 
 `Input(...)` declares one pending destination input. The next created, resolved,
 or existing playable consumes it:
@@ -214,7 +270,7 @@ Source output rules:
 - The same source output port cannot be connected to more than one destination.
 - Fan-out requires explicit additional output ports.
 
-## Weights And Layers
+### Weights And Layers
 
 Assign weights explicitly:
 
@@ -310,7 +366,7 @@ FluentBuilder.Create(existingGraph)
   .WithPlayable(additivePlayable, sourceOutputPort: 0)
   .WithWeight(applyAdditive, "AdditivePose", 1f)
 
-  .Build(play: false);
+  .Build(play: false);// validation here
 ```
 
 ## License

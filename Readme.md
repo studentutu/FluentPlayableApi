@@ -1,5 +1,7 @@
 # Unity Fluent API for Playable Api
 
+![FluentPlayableAPI](./Images/FluentPlayableAPI.png)
+
 ## Quick Navigation
 
 - [Summary](#summary)
@@ -10,6 +12,15 @@
 - [License](#license)
 
 ## Summary
+
+Fluent Playable API is a compact declaration layer over Unity's `PlayableGraph`.
+It helps create, connect, name, resolve, and validate Unity playables while still
+returning a normal Unity `PlayableGraph`.
+
+It solves authoring topology issue, where Unity provides flat view, Fluent API provides visibility and maintainability.
+
+The API is intentionally small. It does not replace Unity's graph types, own
+graph lifetime, or add project-specific animation concepts.
 
 This repository hosts development environment and samples for the underlying package [Packages/com.studentutu.fluentplayableapi/README.md](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi/README.md).
 
@@ -22,6 +33,7 @@ This repository hosts development environment and samples for the underlying pac
 ### Project usage example
 
 See SampleScene and FluentPlayableApi\Assets\Scripts\AnimationGraphExample.cs for the use of Fluent Playable API.
+Use PlayableGraphMonitor to view the graph and individual connections.
 
 More in-depth examples see in package: [Package README](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi/README.md)
 
@@ -37,7 +49,7 @@ The distributable Unity package lives at [Packages/com.studentutu.fluentplayable
 4. Enter the following URL and click `Add`:
 
 ```text
-https://github.com/studentutu/VoxGeoFoliage.git?path=/Packages/com.voxgeofol.vegetation
+https://github.com/studentutu/FluentPlayableApi.git?path=/FluentPlayableApi/Packages/com.studentutu.fluentplayableapi
 ```
 
 > NOTE: If you want to pin the install, append `#branch`, `#tag`, or a commit SHA. Do not assume repo tags map cleanly to `package.json` versions.
@@ -49,7 +61,7 @@ https://github.com/studentutu/VoxGeoFoliage.git?path=/Packages/com.voxgeofol.veg
 3. Add the package entry under `"dependencies"`:
 
 ```json
-"com.studentutu.fluentplayableapi": "https://github.com/studentutu/VoxGeoFoliage.git?path=/Packages/com.voxgeofol.vegetation"
+"com.studentutu.fluentplayableapi": "https://github.com/studentutu/FluentPlayableApi.git?path=/FluentPlayableApi/Packages/com.studentutu.fluentplayableapi"
 ```
 
 4. Reopen the project in Unity and let Package Manager resolve the dependency.
@@ -59,7 +71,7 @@ https://github.com/studentutu/VoxGeoFoliage.git?path=/Packages/com.voxgeofol.veg
 If this repository is already checked out next to your Unity project, you can point `manifest.json` to the package folder directly:
 
 ```json
-"com.studentutu.fluentplayableapi": "file:../path-to-cloned-repo/Packages/com.studentutu.fluentplayableapi"
+"com.studentutu.fluentplayableapi": "file:../path-to-cloned-repo/FluentPlayableApi/Packages/com.studentutu.fluentplayableapi"
 ```
 
 Replace `../path-to-cloned-repo` with the actual relative path from your Unity project's `Packages/manifest.json` file to this repository clone.

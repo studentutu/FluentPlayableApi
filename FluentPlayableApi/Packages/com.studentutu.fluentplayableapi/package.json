@@ -1,14 +1,17 @@
 {
   "name": "com.studentutu.fluentplayableapi",
   "displayName": "FluentPlayableApi",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "unity": "6000.0",
   "unityRelease": "1f1",
   "description": "Fluent API for Unity Playable API with validations",
   "author": {
     "name": "Roman Fedorov",
-    "url": "http://www.example.com",
+    "url": "https://github.com/studentutu/FluentPlayableApi",
     "email": "studentutu@email.com"
   },
-  "hideInEditor": false
+  "hideInEditor": false,
+  "documentationUrl": "https://github.com/studentutu/FluentPlayableApi/blob/master/FluentPlayableApi/Packages/com.studentutu.fluentplayableapi/README.md",
+  "licensesUrl": "https://github.com/studentutu/FluentPlayableApi/blob/master/FluentPlayableApi/Packages/com.studentutu.fluentplayableapi/LICENSE",
+  "changelogUrl": "https://github.com/studentutu/FluentPlayableApi/blob/master/FluentPlayableApi/Packages/com.studentutu.fluentplayableapi/CHANGELOG.md"
 }
