@@ -1,4 +1,4 @@
-# Proposed Fluent Playable API
+# Fluent Playable API
 
 ## Quick Navigation
 
