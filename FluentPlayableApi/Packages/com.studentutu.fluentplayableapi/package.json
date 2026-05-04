@@ -1,0 +1,14 @@
+{
+  "name": "com.studentutu.fluentplayableapi",
+  "displayName": "FluentPlayableApi",
+  "version": "0.1.0",
+  "unity": "6000.0",
+  "unityRelease": "1f1",
+  "description": "Fluent API for Playable API with validation",
+  "author": {
+    "name": "Roman Fedorov",
+    "url": "http://www.example.com",
+    "email": "studentutu@email.com"
+  },
+  "hideInEditor": false
+}

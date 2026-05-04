@@ -1,0 +1,11 @@
+{
+    "name": "Studentutu.Fluentplayableapi.Tests",
+    "references": [
+        "Studentutu.Fluentplayableapi"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}
