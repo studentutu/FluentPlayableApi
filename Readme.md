@@ -25,7 +25,6 @@ See SampleScene and FluentPlayableApi\Assets\Scripts\AnimationGraphExample.cs fo
 
 More in-depth examples see in package: [Package README](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi/README.md)
 
-
 ## Install
 
 The distributable Unity package lives at [Packages/com.studentutu.fluentplayableapi](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi). If you only need the package in another project, install that package path directly instead of copying repo files by hand.
