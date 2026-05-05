@@ -1,7 +1,7 @@
 {
   "name": "com.studentutu.fluentplayableapi",
   "displayName": "FluentPlayableApi",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "unity": "6000.0",
   "unityRelease": "1f1",
   "description": "Fluent API for Unity Playable API with validations",
