@@ -32,12 +32,25 @@ namespace Fluentplayableapi
             where TPlayable : struct, IPlayable
         {
             string normalizedPath = TopologyPath.Normalize(path);
+            EnsureNodePathAvailable(normalizedPath);
+            RegisterNodeRecord(normalizedPath, playable);
+        }
+
+        /// <summary>
+        /// Verifies that a node path can be registered before a Unity playable is created.
+        /// </summary>
+        public void EnsureNodePathAvailable(string path)
+        {
+            string normalizedPath = TopologyPath.Normalize(path);
             if (_reservedScopePaths.Contains(normalizedPath))
             {
                 throw new InvalidOperationException($"Path '{normalizedPath}' is already reserved by a scope.");
             }
 
-            RegisterNodeRecord(normalizedPath, playable);
+            if (_nodesByPath.ContainsKey(normalizedPath))
+            {
+                throw new InvalidOperationException($"Path '{normalizedPath}' is already registered.");
+            }
         }
 
         /// <summary>

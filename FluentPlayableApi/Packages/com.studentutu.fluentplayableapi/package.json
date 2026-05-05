@@ -1,10 +1,10 @@
 {
   "name": "com.studentutu.fluentplayableapi",
   "displayName": "FluentPlayableApi",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "unity": "6000.0",
   "unityRelease": "1f1",
-  "description": "Fluent API for Unity Playable API with validations",
+  "description": "Fluent API for Unity Playable API with verification",
   "author": {
     "name": "Roman Fedorov",
     "url": "https://github.com/studentutu/FluentPlayableApi",

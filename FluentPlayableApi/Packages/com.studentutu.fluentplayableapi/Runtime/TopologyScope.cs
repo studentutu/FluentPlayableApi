@@ -39,9 +39,9 @@ namespace Fluentplayableapi
         /// <summary>
         /// Declares the next playable as the source for an animation output.
         /// </summary>
-        public TopologyScope Input(AnimationPlayableOutput output, int index = 0)
+        public TopologyScope Input(AnimationPlayableOutput output, int sourceOutputPort = 0)
         {
-            _builder.DeclareOutputInput(output, index);
+            _builder.DeclareOutputInput(output, sourceOutputPort);
             return this;
         }
 
@@ -71,6 +71,7 @@ namespace Fluentplayableapi
         public TopologyScope WithMixer<TMixer>(int inputCount, out TMixer mixer, string? name = null, int outputCount = 1)
             where TMixer : struct, IPlayable
         {
+            _builder.EnsureNodePathAvailable(name, Path);
             _builder.WithMixer(inputCount, out mixer, null, outputCount);
             if (name != null)
             {
@@ -85,6 +86,7 @@ namespace Fluentplayableapi
         /// </summary>
         public TopologyScope WithClip(AnimationClip clip, out AnimationClipPlayable playable, string? name = null, bool paused = true)
         {
+            _builder.EnsureNodePathAvailable(name, Path);
             _builder.WithClip(clip, out playable, null, paused);
             if (name != null)
             {
@@ -104,6 +106,7 @@ namespace Fluentplayableapi
             string? name = null)
             where TBehaviour : PlayableBehaviour, new()
         {
+            _builder.EnsureNodePathAvailable(name, Path);
             _builder.WithScript(out playable, inputCount, outputCount, null);
             if (name != null)
             {
@@ -122,6 +125,7 @@ namespace Fluentplayableapi
             string? name = null)
             where TPlayable : struct, IPlayable
         {
+            _builder.EnsureNodePathAvailable(name, Path);
             _builder.WithPlayable(factory, out playable, null);
             if (name != null)
             {

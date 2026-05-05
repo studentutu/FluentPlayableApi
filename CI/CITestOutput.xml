@@ -1,71 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<test-run id="2" testcasecount="9" result="Passed" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.0700602">
-  <test-suite type="TestSuite" id="1000" name="FluentPlayableApi" fullname="FluentPlayableApi" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.070060" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+<test-run id="2" testcasecount="11" result="Passed" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.0913158">
+  <test-suite type="TestSuite" id="1000" name="FluentPlayableApi" fullname="FluentPlayableApi" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.091316" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
     <properties>
       <property name="platform" value="EditMode" />
     </properties>
-    <test-suite type="Assembly" id="1011" name="Fluentplayableapi.Editor.Tests.dll" fullname="C:/Users/admin/Documents/UnityProjects/FluentPlayableApi/FluentPlayableApi/Library/ScriptAssemblies/Fluentplayableapi.Editor.Tests.dll" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.063309" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <test-suite type="Assembly" id="1013" name="Fluentplayableapi.Editor.Tests.dll" fullname="C:/Users/admin/Documents/UnityProjects/FluentPlayableApi/FluentPlayableApi/Library/ScriptAssemblies/Fluentplayableapi.Editor.Tests.dll" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.082268" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
       <properties>
-        <property name="_PID" value="48152" />
+        <property name="_PID" value="69336" />
         <property name="_APPDOMAIN" value="Unity Child Domain" />
         <property name="platform" value="EditMode" />
         <property name="EditorOnly" value="True" />
       </properties>
-      <test-suite type="TestSuite" id="1012" name="Fluentplayableapi" fullname="Fluentplayableapi" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.062508" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <test-suite type="TestSuite" id="1014" name="Fluentplayableapi" fullname="Fluentplayableapi" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.081452" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
         <properties />
-        <test-suite type="TestSuite" id="1013" name="Tests" fullname="Fluentplayableapi.Tests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.062030" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <test-suite type="TestSuite" id="1015" name="Tests" fullname="Fluentplayableapi.Tests" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.080962" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
           <properties />
-          <test-suite type="TestFixture" id="1001" name="ExampleTest" fullname="Fluentplayableapi.Tests.ExampleTest" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.060834" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <test-suite type="TestFixture" id="1001" name="ExampleTest" fullname="Fluentplayableapi.Tests.ExampleTest" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" testcasecount="11" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.079655" total="11" passed="11" failed="0" inconclusive="0" skipped="0" asserts="0">
             <properties />
-            <test-case id="1009" name="AddInputExpandsMixerAndNamesNewIndex" fullname="Fluentplayableapi.Tests.ExampleTest.AddInputExpandsMixerAndNamesNewIndex" methodname="AddInputExpandsMixerAndNamesNewIndex" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="1199110516" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.029880" asserts="0">
+            <test-case id="1010" name="AddInputExpandsMixerAndNamesNewIndex" fullname="Fluentplayableapi.Tests.ExampleTest.AddInputExpandsMixerAndNamesNewIndex" methodname="AddInputExpandsMixerAndNamesNewIndex" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="46324403" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.038846" asserts="0">
               <properties>
                 <property name="retryIteration" value="0" />
                 <property name="repeatIteration" value="0" />
               </properties>
             </test-case>
-            <test-case id="1002" name="BuildCreatesReachableGraphAndRegistersLookup" fullname="Fluentplayableapi.Tests.ExampleTest.BuildCreatesReachableGraphAndRegistersLookup" methodname="BuildCreatesReachableGraphAndRegistersLookup" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="1001888876" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.011167" asserts="0">
+            <test-case id="1011" name="AddInputRollsBackInputCountWhenNameIsRejected" fullname="Fluentplayableapi.Tests.ExampleTest.AddInputRollsBackInputCountWhenNameIsRejected" methodname="AddInputRollsBackInputCountWhenNameIsRejected" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="963254165" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.000859" asserts="0">
               <properties>
                 <property name="retryIteration" value="0" />
                 <property name="repeatIteration" value="0" />
               </properties>
             </test-case>
-            <test-case id="1003" name="BuildPlayFlagControlsGraphPlayState" fullname="Fluentplayableapi.Tests.ExampleTest.BuildPlayFlagControlsGraphPlayState" methodname="BuildPlayFlagControlsGraphPlayState" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="1362673452" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.000546" asserts="0">
+            <test-case id="1012" name="ClipPausedParameterControlsInitialPlayState" fullname="Fluentplayableapi.Tests.ExampleTest.ClipPausedParameterControlsInitialPlayState" methodname="ClipPausedParameterControlsInitialPlayState" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="238091630" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.001674" asserts="0">
               <properties>
                 <property name="retryIteration" value="0" />
                 <property name="repeatIteration" value="0" />
               </properties>
             </test-case>
-            <test-case id="1010" name="ClipPausedParameterControlsInitialPlayState" fullname="Fluentplayableapi.Tests.ExampleTest.ClipPausedParameterControlsInitialPlayState" methodname="ClipPausedParameterControlsInitialPlayState" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="1894413971" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.000392" asserts="0">
+            <test-case id="1005" name="DisposeClearsBuilderWithoutDestroyingGraph" fullname="Fluentplayableapi.Tests.ExampleTest.DisposeClearsBuilderWithoutDestroyingGraph" methodname="DisposeClearsBuilderWithoutDestroyingGraph" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="243642998" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.008317" asserts="0">
               <properties>
                 <property name="retryIteration" value="0" />
                 <property name="repeatIteration" value="0" />
               </properties>
             </test-case>
-            <test-case id="1004" name="DisposeClearsBuilderWithoutDestroyingGraph" fullname="Fluentplayableapi.Tests.ExampleTest.DisposeClearsBuilderWithoutDestroyingGraph" methodname="DisposeClearsBuilderWithoutDestroyingGraph" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="1287570253" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.000594" asserts="0">
+            <test-case id="1007" name="DuplicateNodePathThrowsImmediately" fullname="Fluentplayableapi.Tests.ExampleTest.DuplicateNodePathThrowsImmediately" methodname="DuplicateNodePathThrowsImmediately" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="1858808916" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.000504" asserts="0">
               <properties>
                 <property name="retryIteration" value="0" />
                 <property name="repeatIteration" value="0" />
               </properties>
             </test-case>
-            <test-case id="1006" name="DuplicateNodePathThrowsImmediately" fullname="Fluentplayableapi.Tests.ExampleTest.DuplicateNodePathThrowsImmediately" methodname="DuplicateNodePathThrowsImmediately" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="2034611544" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.000378" asserts="0">
+            <test-case id="1008" name="DuplicateSourceOutputThrows" fullname="Fluentplayableapi.Tests.ExampleTest.DuplicateSourceOutputThrows" methodname="DuplicateSourceOutputThrows" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="1512938003" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.001210" asserts="0">
               <properties>
                 <property name="retryIteration" value="0" />
                 <property name="repeatIteration" value="0" />
               </properties>
             </test-case>
-            <test-case id="1007" name="DuplicateSourceOutputThrows" fullname="Fluentplayableapi.Tests.ExampleTest.DuplicateSourceOutputThrows" methodname="DuplicateSourceOutputThrows" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="558250804" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.000884" asserts="0">
+            <test-case id="1006" name="InputValidationRejectsBoundsAndUnconsumedPendingInputs" fullname="Fluentplayableapi.Tests.ExampleTest.InputValidationRejectsBoundsAndUnconsumedPendingInputs" methodname="InputValidationRejectsBoundsAndUnconsumedPendingInputs" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="1801841182" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.000687" asserts="0">
               <properties>
                 <property name="retryIteration" value="0" />
                 <property name="repeatIteration" value="0" />
               </properties>
             </test-case>
-            <test-case id="1005" name="InputValidationRejectsBoundsAndUnconsumedPendingInputs" fullname="Fluentplayableapi.Tests.ExampleTest.InputValidationRejectsBoundsAndUnconsumedPendingInputs" methodname="InputValidationRejectsBoundsAndUnconsumedPendingInputs" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="1063370884" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.000647" asserts="0">
+            <test-case id="1009" name="ScopeLookupRequiresExactPathWhenShortNameIsAmbiguous" fullname="Fluentplayableapi.Tests.ExampleTest.ScopeLookupRequiresExactPathWhenShortNameIsAmbiguous" methodname="ScopeLookupRequiresExactPathWhenShortNameIsAmbiguous" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="184284713" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.003575" asserts="0">
               <properties>
                 <property name="retryIteration" value="0" />
                 <property name="repeatIteration" value="0" />
               </properties>
             </test-case>
-            <test-case id="1008" name="ScopeLookupRequiresExactPathWhenShortNameIsAmbiguous" fullname="Fluentplayableapi.Tests.ExampleTest.ScopeLookupRequiresExactPathWhenShortNameIsAmbiguous" methodname="ScopeLookupRequiresExactPathWhenShortNameIsAmbiguous" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="452997832" result="Passed" start-time="2026-05-05 19:40:22Z" end-time="2026-05-05 19:40:22Z" duration="0.002243" asserts="0">
+            <test-case id="1002" name="VerifyCreatesReachableGraphAndRegistersLookup" fullname="Fluentplayableapi.Tests.ExampleTest.VerifyCreatesReachableGraphAndRegistersLookup" methodname="VerifyCreatesReachableGraphAndRegistersLookup" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="1838630874" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.003378" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1004" name="VerifyRejectsAuthoredOutputWithoutSource" fullname="Fluentplayableapi.Tests.ExampleTest.VerifyRejectsAuthoredOutputWithoutSource" methodname="VerifyRejectsAuthoredOutputWithoutSource" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="370106521" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.000631" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1003" name="VerifyReturnsGraphWithoutStartingPlayback" fullname="Fluentplayableapi.Tests.ExampleTest.VerifyReturnsGraphWithoutStartingPlayback" methodname="VerifyReturnsGraphWithoutStartingPlayback" classname="Fluentplayableapi.Tests.ExampleTest" runstate="Runnable" seed="1185850793" result="Passed" start-time="2026-05-05 20:51:11Z" end-time="2026-05-05 20:51:11Z" duration="0.000485" asserts="0">
               <properties>
                 <property name="retryIteration" value="0" />
                 <property name="repeatIteration" value="0" />

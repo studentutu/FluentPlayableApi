@@ -9,7 +9,7 @@ using UnityEngine.Playables;
 namespace Fluentplayableapi
 {
     /// <summary>
-    /// Declares, connects, names, and validates Unity playables through a compact fluent API.
+    /// Declares, connects, names, and verifies Unity playables through a compact fluent API.
     /// </summary>
     public sealed class FluentBuilder : IDisposable
     {
@@ -17,6 +17,7 @@ namespace Fluentplayableapi
         private readonly List<DeclaredInput> _declaredInputs = new List<DeclaredInput>();
         private readonly HashSet<DestinationInputKey> _declaredDestinationInputs = new HashSet<DestinationInputKey>();
         private readonly HashSet<SourceOutputKey> _claimedSourceOutputs = new HashSet<SourceOutputKey>();
+        private readonly HashSet<PlayableOutputHandle> _authoredOutputs = new HashSet<PlayableOutputHandle>();
         private readonly HashSet<PlayableOutputHandle> _claimedOutputs = new HashSet<PlayableOutputHandle>();
 
         private readonly Dictionary<PlayableHandle, List<PlayableHandle>> _sourceInputsByDestination =
@@ -25,7 +26,7 @@ namespace Fluentplayableapi
         private readonly List<PlayableHandle> _outputRoots = new List<PlayableHandle>();
         private readonly HashSet<PendingInput> _suspendedPendingInputs = new HashSet<PendingInput>();
         private PendingInput? _pendingInput;
-        private bool _built;
+        private bool _verified;
         private bool _disposed;
 
         private FluentBuilder(PlayableGraph graph)
@@ -72,16 +73,18 @@ namespace Fluentplayableapi
             }
 
             output = AnimationPlayableOutput.Create(Graph, name, animator);
+            _authoredOutputs.Add(output.GetHandle());
+            InvalidateVerification();
             return this;
         }
 
         /// <summary>
         /// Declares the next playable as the source for an animation output.
         /// </summary>
-        public FluentBuilder Input(AnimationPlayableOutput output, int index = 0)
+        public FluentBuilder Input(AnimationPlayableOutput output, int sourceOutputPort = 0)
         {
             EnsureNotDisposed();
-            DeclareOutputInput(output, index);
+            DeclareOutputInput(output, sourceOutputPort);
             return this;
         }
 
@@ -103,9 +106,19 @@ namespace Fluentplayableapi
             where TDestination : struct, IPlayable
         {
             EnsureNotDisposed();
+            InvalidateVerification();
             index = destination.GetInputCount();
             destination.SetInputCount(index + 1);
-            DeclarePlayableInput(destination, index, name);
+            try
+            {
+                DeclarePlayableInput(destination, index, name);
+            }
+            catch
+            {
+                destination.SetInputCount(index);
+                throw;
+            }
+
             return this;
         }
 
@@ -127,6 +140,7 @@ namespace Fluentplayableapi
             where TMixer : struct, IPlayable
         {
             EnsureNotDisposed();
+            EnsureNodePathAvailable(name, null);
             mixer = CreateMixerWithGraph<TMixer>(inputCount, outputCount);
             RegisterAndAttachCreatedPlayable(mixer, name, null);
             return this;
@@ -144,6 +158,7 @@ namespace Fluentplayableapi
                 throw new ArgumentNullException(nameof(clip));
             }
 
+            EnsureNodePathAvailable(name, null);
             playable = AnimationClipPlayable.Create(Graph, clip);
             playable.SetOutputCount(1);
             playable.SetApplyFootIK(false);
@@ -172,6 +187,7 @@ namespace Fluentplayableapi
         {
             EnsureNotDisposed();
             ValidateCounts(inputCount, outputCount);
+            EnsureNodePathAvailable(name, null);
             playable = ScriptPlayable<TBehaviour>.Create(Graph, inputCount);
             playable.SetOutputCount(outputCount);
             RegisterAndAttachCreatedPlayable(playable, name, null);
@@ -193,6 +209,7 @@ namespace Fluentplayableapi
                 throw new ArgumentNullException(nameof(factory));
             }
 
+            EnsureNodePathAvailable(name, null);
             playable = factory(Graph);
             EnsureValidPlayable(playable, nameof(playable));
             if (playable.GetOutputCount() == 0)
@@ -283,18 +300,16 @@ namespace Fluentplayableapi
         }
 
         /// <summary>
-        /// Validates fluent declarations and optionally starts the graph.
+        /// Verifies fluent declarations and returns the authored graph without starting playback.
         /// </summary>
-        public PlayableGraph Build(bool play = true)
+        public PlayableGraph Verify(bool skipVerification = false)
         {
-            EnsureNotDisposed();
-            ValidateBuild();
-            if (play)
-            {
-                Graph.Play();
-            }
+            if (skipVerification)
+                return Graph;
 
-            _built = true;
+            EnsureNotDisposed();
+            VerifyDeclarations();
+            _verified = true;
             return Graph;
         }
 
@@ -305,7 +320,7 @@ namespace Fluentplayableapi
             where TPlayable : struct, IPlayable
         {
             EnsureNotDisposed();
-            EnsureBuilt();
+            EnsureVerified();
             return _registry.Resolve<TPlayable>(key);
         }
 
@@ -316,7 +331,7 @@ namespace Fluentplayableapi
             where TPlayable : struct, IPlayable
         {
             EnsureNotDisposed();
-            EnsureBuilt();
+            EnsureVerified();
             return _registry.InputIndex(destination, inputName);
         }
 
@@ -326,7 +341,7 @@ namespace Fluentplayableapi
         public int InputIndex(string nodeKey, string inputName)
         {
             EnsureNotDisposed();
-            EnsureBuilt();
+            EnsureVerified();
             return _registry.InputIndex(nodeKey, inputName);
         }
 
@@ -344,12 +359,13 @@ namespace Fluentplayableapi
             _declaredInputs.Clear();
             _declaredDestinationInputs.Clear();
             _claimedSourceOutputs.Clear();
+            _authoredOutputs.Clear();
             _claimedOutputs.Clear();
             _sourceInputsByDestination.Clear();
             _outputRoots.Clear();
             _suspendedPendingInputs.Clear();
             _registry.Clear();
-            _built = false;
+            _verified = false;
 
             _disposed = true;
         }
@@ -357,6 +373,7 @@ namespace Fluentplayableapi
         internal TopologyScope BeginScope(string normalizedPath)
         {
             EnsureNotDisposed();
+            InvalidateVerification();
             _registry.RegisterScopePath(normalizedPath);
             PendingInput? parentPendingInput = _pendingInput;
             if (parentPendingInput != null)
@@ -372,6 +389,7 @@ namespace Fluentplayableapi
             where TPlayable : struct, IPlayable
         {
             EnsureNotDisposed();
+            InvalidateVerification();
             if (_pendingInput != null)
             {
                 throw new InvalidOperationException($"Scope '{scope.Path}' has an unconsumed pending input.");
@@ -383,6 +401,17 @@ namespace Fluentplayableapi
                 AttachPlayableToPending(root, 0, scope.ParentPendingInput);
                 _suspendedPendingInputs.Remove(scope.ParentPendingInput);
             }
+        }
+
+        internal void EnsureNodePathAvailable(string? name, string? scopePath)
+        {
+            if (name == null)
+            {
+                return;
+            }
+
+            string nodePath = scopePath == null ? TopologyPath.Normalize(name) : TopologyPath.Join(scopePath, name);
+            _registry.EnsureNodePathAvailable(nodePath);
         }
 
         internal void DeclareOutputInput(AnimationPlayableOutput output, int sourceOutputPort)
@@ -400,6 +429,7 @@ namespace Fluentplayableapi
             }
 
             EnsureNoPendingInput();
+            InvalidateVerification();
             PlayableOutputHandle handle = output.GetHandle();
             if (!_claimedOutputs.Add(handle))
             {
@@ -418,9 +448,10 @@ namespace Fluentplayableapi
             EnsureValidPlayable(destination, nameof(destination));
             ValidatePlayableInputIndex(destination, index);
             EnsureNoPendingInput();
+            InvalidateVerification();
 
             var destinationKey = new DestinationInputKey(destination.GetHandle(), index);
-            if (!_declaredDestinationInputs.Add(destinationKey))
+            if (_declaredDestinationInputs.Contains(destinationKey))
             {
                 throw new InvalidOperationException($"Destination input {index} is already declared.");
             }
@@ -429,6 +460,8 @@ namespace Fluentplayableapi
             {
                 _registry.RegisterInputName(destination, index, name);
             }
+
+            _declaredDestinationInputs.Add(destinationKey);
 
             var declaredInput = new DeclaredInput();
             _declaredInputs.Add(declaredInput);
@@ -440,6 +473,7 @@ namespace Fluentplayableapi
         {
             EnsureNotDisposed();
             EnsureValidPlayable(playable, nameof(playable));
+            InvalidateVerification();
             if (name != null)
             {
                 string nodePath = scopePath == null ? TopologyPath.Normalize(name) : TopologyPath.Join(scopePath, name);
@@ -485,6 +519,7 @@ namespace Fluentplayableapi
         {
             int sourceOutputPort = pendingInput.IsOutput ? pendingInput.SourceOutputPort : requestedSourceOutputPort;
             ValidateSourceOutput(playable, sourceOutputPort);
+            InvalidateVerification();
 
             SourceOutputKey sourceOutputKey = new SourceOutputKey(playable.GetHandle(), sourceOutputPort);
             if (!_claimedSourceOutputs.Add(sourceOutputKey))
@@ -517,11 +552,19 @@ namespace Fluentplayableapi
             pendingInput.DeclaredInput.Consumed = true;
         }
 
-        private void ValidateBuild()
+        private void VerifyDeclarations()
         {
             if (_pendingInput != null || _suspendedPendingInputs.Count > 0)
             {
                 throw new InvalidOperationException("A pending input was declared but not consumed.");
+            }
+
+            foreach (PlayableOutputHandle output in _authoredOutputs)
+            {
+                if (!_claimedOutputs.Contains(output))
+                {
+                    throw new InvalidOperationException("A fluent-authored output has no source declaration.");
+                }
             }
 
             for (int i = 0; i < _declaredInputs.Count; i++)
@@ -647,11 +690,16 @@ namespace Fluentplayableapi
             }
         }
 
-        private void EnsureBuilt()
+        private void InvalidateVerification()
         {
-            if (!_built)
+            _verified = false;
+        }
+
+        private void EnsureVerified()
+        {
+            if (!_verified)
             {
-                throw new InvalidOperationException("Build the fluent builder before querying fluent metadata.");
+                throw new InvalidOperationException("Verify the fluent builder before querying fluent metadata.");
             }
         }
 

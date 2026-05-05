@@ -11,13 +11,14 @@
 
 ## Summary
 
-Fluent Playable API is a compact declaration layer over Unity's `PlayableGraph`.
-It helps create, connect, name, resolve, and validate Unity playables while still
+Fluent Playable API is a compact declaration layer over Unity's `PlayableGraph` (Playable API).
+It helps create, connect, name, resolve, and verify Unity playables while still
 returning a normal Unity `PlayableGraph`.
 
-The builder does not own the graph; it only provides helper API to build it.
+The builder does not own the graph; it only provides helper API to author and
+verify it.
 
-It addresses a graph authoring problem: Unity provides a flat view, while Fluent
+It addresses a current issue with Unity graph authoring problem: Unity provides a flat view, while Fluent
 Playable API keeps topology visible and maintainable in code.
 
 The API is intentionally small. It does not replace Unity's graph types, own
@@ -73,7 +74,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-// 1. Author the topology.
+// 1. Author the topology. This Auto-dispose to clear cache lookup, does not destroy the actual graph/nodes.
 using FluentBuilder builder = FluentBuilder.Create("CharacterGraph");
 PlayableGraph graph = builder
   .Output(animator, out AnimationPlayableOutput output)
@@ -89,11 +90,18 @@ PlayableGraph graph = builder
   .WithClip(baseClip, out AnimationClipPlayable baseClipPlayable, name: "BaseClip")
   .WithWeight(rootMixer, "BaseClip", 1f)
 
-  .Build();
+  .Verify();
 
-// 2. Link custom animation classes to this builder's fluent metadata.
+// 2. Start playback explicitly when needed.
+graph.Play();
+
+// 3. Link custom animation classes to this builder's fluent metadata.
 AnimationMixerPlayable resolvedRoot = builder.Resolve<AnimationMixerPlayable>("RootMixer");
 int baseClipInput = builder.InputIndex("RootMixer", "BaseClip");
+
+// 4. Or manually clear cache lookup, does not destroy the actual graph/nodes.
+// This will prevent all further usage of the builder instance.
+builder.Dispose();
 ```
 
 ### Entry Points
@@ -106,7 +114,8 @@ FluentBuilder.Create(existingGraph)
 `Create(existingGraph)` reuses the graph instance only. It does not clear graph
 outputs, assume an existing output, or own graph destruction.
 
-`Build(play: false)` returns the graph without starting playback.
+`Verify()` validates fluent declarations and returns the graph without starting
+playback. Call `PlayableGraph.Play()` explicitly when playback should start.
 
 `Dispose()` clears only metadata and caches owned by the `FluentBuilder`
 instance. It does not destroy, stop, or otherwise own the `PlayableGraph`.
@@ -118,7 +127,7 @@ instance. It does not destroy, stop, or otherwise own the `PlayableGraph`.
 
 .Scope(path)
 
-.Input(output, index = 0)
+.Input(output, sourceOutputPort = 0)
 .Input(playable, index, name = null)
 .AddInput(playable, name, out index)
 
@@ -137,13 +146,13 @@ instance. It does not destroy, stop, or otherwise own the `PlayableGraph`.
 
 .CompileAs(playable)
 
-.Build(play = true) // validation here
+.Verify() // validation only; does not start playback
 
 .Resolve<TPlayable>(key)
 .InputIndex(destination, inputName)
 .InputIndex(nodeKey, inputName)
 
-.Dispose() // clears builder metadata only
+.Dispose() // clears builder metadata only (lookups), does not destroy playable graph, does not modify any nodes.
 ```
 
 ### Mixers
@@ -325,14 +334,15 @@ an already declared fluent edge.
 
 ## Validation
 
-`Build(...)` validates fluent declarations before returning the graph. Fluent
-metadata lookup remains on the actual `FluentBuilder` instance until it is
-disposed.
+`Verify()` validates fluent declarations before returning the graph. It does not
+connect additional nodes and does not start playback. Fluent metadata lookup
+remains on the actual `FluentBuilder` instance until it is disposed.
 
 Validation fails when:
 
 - A pending input was not consumed.
 - A declared input was never consumed.
+- A fluent-authored output has no source declaration.
 - A destination input is reassigned.
 - A registered node is unreachable from every authored output.
 - A scope path or node path is duplicated.
@@ -385,7 +395,7 @@ builder
   .WithPlayable(additivePlayable, sourceOutputPort: 0)
   .WithWeight(applyAdditive, "AdditivePose", 1f)
 
-  .Build(play: false); // validation here
+  .Verify(); // validation only
 ```
 
 ## License

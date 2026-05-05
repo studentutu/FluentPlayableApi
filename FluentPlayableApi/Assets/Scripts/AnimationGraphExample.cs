@@ -76,7 +76,9 @@ public class AnimationGraphExample : MonoBehaviour
         AddClipsToSlot(_builder, upperBodySlot, UpperBody, "UpperBody", PickRandomValidClipIndex(UpperBody));
         AddClipsToSlot(_builder, fullBodySlot, FullBody, "FullBody", enabledInput: -1);
 
-        _graph = _builder.Build(play: !Manual); // validates here.
+        _graph = _builder.Verify(); // validates here.
+        if (!Manual)
+            _graph.Play();
     }
 
     private void OnDestroy()

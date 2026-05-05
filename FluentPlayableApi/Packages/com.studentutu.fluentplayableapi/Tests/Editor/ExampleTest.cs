@@ -11,7 +11,7 @@ namespace Fluentplayableapi.Tests
     public class ExampleTest
     {
         [Test]
-        public void BuildCreatesReachableGraphAndRegistersLookup()
+        public void VerifyCreatesReachableGraphAndRegistersLookup()
         {
             GameObject animatorObject = CreateAnimatorObject(out Animator animator);
             FluentBuilder? builder = null;
@@ -28,7 +28,7 @@ namespace Fluentplayableapi.Tests
                     .Input(root, 0, "Clip")
                     .WithClip(new AnimationClip(), out AnimationClipPlayable clipPlayable, "Clip")
                     .WithWeight(root, "Clip", 1f)
-                    .Build(play: false);
+                    .Verify();
 
                 Assert.IsTrue(graph.IsValid());
                 Assert.IsFalse(graph.IsPlaying());
@@ -47,7 +47,7 @@ namespace Fluentplayableapi.Tests
         }
 
         [Test]
-        public void BuildPlayFlagControlsGraphPlayState()
+        public void VerifyReturnsGraphWithoutStartingPlayback()
         {
             PlayableGraph graph = PlayableGraph.Create("ExistingGraph");
             FluentBuilder? builder = null;
@@ -55,10 +55,10 @@ namespace Fluentplayableapi.Tests
             try
             {
                 builder = FluentBuilder.Create(graph);
-                PlayableGraph builtGraph = builder.Build(play: true);
+                PlayableGraph verifiedGraph = builder.Verify();
 
-                Assert.AreEqual(graph.GetHashCode(), builtGraph.GetHashCode());
-                Assert.IsTrue(builtGraph.IsPlaying());
+                Assert.AreEqual(graph.GetHashCode(), verifiedGraph.GetHashCode());
+                Assert.IsFalse(verifiedGraph.IsPlaying());
             }
             finally
             {
@@ -67,6 +67,26 @@ namespace Fluentplayableapi.Tests
                 {
                     graph.Destroy();
                 }
+            }
+        }
+
+        [Test]
+        public void VerifyRejectsAuthoredOutputWithoutSource()
+        {
+            GameObject animatorObject = CreateAnimatorObject(out Animator animator);
+            FluentBuilder builder = FluentBuilder.Create("OutputValidationGraph");
+
+            try
+            {
+                builder.Output(animator, out _);
+
+                Assert.Throws<InvalidOperationException>(() => builder.Verify());
+            }
+            finally
+            {
+                PlayableGraph graph = builder.Graph;
+                builder.Dispose();
+                DestroyGraphAndObject(graph, animatorObject);
             }
         }
 
@@ -83,7 +103,7 @@ namespace Fluentplayableapi.Tests
                     .Output(animator, out AnimationPlayableOutput output)
                     .Input(output)
                     .WithMixer<AnimationMixerPlayable>(0, out _, "Root")
-                    .Build(play: false);
+                    .Verify();
 
                 builder.Dispose();
 
@@ -111,7 +131,7 @@ namespace Fluentplayableapi.Tests
                 builder.Input(root, 0, "Valid");
 
                 Assert.Throws<InvalidOperationException>(() => builder.Input(root, 0, "Second"));
-                Assert.Throws<InvalidOperationException>(() => builder.Build(play: false));
+                Assert.Throws<InvalidOperationException>(() => builder.Verify());
             }
             finally
             {
@@ -200,7 +220,7 @@ namespace Fluentplayableapi.Tests
                     .Scope("B")
                         .WithMixer<AnimationMixerPlayable>(0, out AnimationMixerPlayable mixerB, "Mixer")
                         .CompileAs(mixerB)
-                    .Build(play: false);
+                    .Verify();
 
                 Assert.AreEqual(mixerA.GetHandle(), builder.Resolve<AnimationMixerPlayable>("A/Mixer").GetHandle());
                 Assert.AreEqual(mixerB.GetHandle(), builder.Resolve<AnimationMixerPlayable>("B/Mixer").GetHandle());
@@ -224,12 +244,41 @@ namespace Fluentplayableapi.Tests
                 builder.WithMixer<AnimationMixerPlayable>(0, out AnimationMixerPlayable mixer);
                 builder.AddInput(mixer, "Generated", out int generatedIndex)
                     .WithClip(new AnimationClip(), out _);
-                builder.Build(play: false);
+                builder.Verify();
 
                 Assert.AreEqual(0, generatedIndex);
                 Assert.AreEqual(1, mixer.GetInputCount());
                 Assert.AreEqual(0, builder.InputIndex(mixer, "Generated"));
                 Assert.Throws<InvalidOperationException>(() => builder.Input(mixer, generatedIndex, "Other"));
+            }
+            finally
+            {
+                PlayableGraph graph = builder.Graph;
+                builder.Dispose();
+                if (graph.IsValid())
+                {
+                    graph.Destroy();
+                }
+            }
+        }
+
+        [Test]
+        public void AddInputRollsBackInputCountWhenNameIsRejected()
+        {
+            FluentBuilder builder = FluentBuilder.Create("AddInputRollbackGraph");
+
+            try
+            {
+                builder.WithMixer<AnimationMixerPlayable>(1, out AnimationMixerPlayable mixer);
+                builder.Input(mixer, 0, "Existing")
+                    .WithClip(new AnimationClip(), out _);
+
+                Assert.Throws<InvalidOperationException>(() => builder.AddInput(mixer, "Existing", out _));
+
+                Assert.AreEqual(1, mixer.GetInputCount());
+                builder.AddInput(mixer, "Generated", out int generatedIndex)
+                    .WithClip(new AnimationClip(), out _);
+                Assert.AreEqual(1, generatedIndex);
             }
             finally
             {
