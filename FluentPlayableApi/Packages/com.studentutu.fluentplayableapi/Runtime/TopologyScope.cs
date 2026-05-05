@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-namespace Studentutu.Fluentplayableapi
+namespace Fluentplayableapi
 {
     /// <summary>
     /// Declares nodes under one fluent topology path.

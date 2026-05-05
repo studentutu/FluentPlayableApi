@@ -15,6 +15,8 @@ Fluent Playable API is a compact declaration layer over Unity's `PlayableGraph`.
 It helps create, connect, name, resolve, and validate Unity playables while still
 returning a normal Unity `PlayableGraph`.
 
+The builder does not own the graph; it only provides helper API to build it.
+
 It addresses a graph authoring problem: Unity provides a flat view, while Fluent
 Playable API keeps topology visible and maintainable in code.
 
@@ -66,13 +68,14 @@ Replace `../path-to-cloned-repo` with the actual relative path from your Unity p
 ## Core Use
 
 ```csharp
-using Studentutu.Fluentplayableapi;
+using Fluentplayableapi;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
 // 1. Author the topology.
-PlayableGraph graph = FluentBuilder.Create("CharacterGraph")
+using FluentBuilder builder = FluentBuilder.Create("CharacterGraph");
+PlayableGraph graph = builder
   .Output(animator, out AnimationPlayableOutput output)
 
   .Input(output)
@@ -88,9 +91,9 @@ PlayableGraph graph = FluentBuilder.Create("CharacterGraph")
 
   .Build();
 
-// 2. Link custom animation classes to fluent metadata.
-AnimationMixerPlayable resolvedRoot = graph.Resolve<AnimationMixerPlayable>("RootMixer");
-int baseClipInput = graph.InputIndex("RootMixer", "BaseClip");
+// 2. Link custom animation classes to this builder's fluent metadata.
+AnimationMixerPlayable resolvedRoot = builder.Resolve<AnimationMixerPlayable>("RootMixer");
+int baseClipInput = builder.InputIndex("RootMixer", "BaseClip");
 ```
 
 ### Entry Points
@@ -104,6 +107,9 @@ FluentBuilder.Create(existingGraph)
 outputs, assume an existing output, or own graph destruction.
 
 `Build(play: false)` returns the graph without starting playback.
+
+`Dispose()` clears only metadata and caches owned by the `FluentBuilder`
+instance. It does not destroy, stop, or otherwise own the `PlayableGraph`.
 
 ## Fluent API
 
@@ -132,6 +138,12 @@ outputs, assume an existing output, or own graph destruction.
 .CompileAs(playable)
 
 .Build(play = true) // validation here
+
+.Resolve<TPlayable>(key)
+.InputIndex(destination, inputName)
+.InputIndex(nodeKey, inputName)
+
+.Dispose() // clears builder metadata only
 ```
 
 ### Mixers
@@ -218,8 +230,8 @@ Character/UpperBody
 Lookup accepts exact paths and unique short names:
 
 ```csharp
-graph.Resolve<AnimationMixerPlayable>("Character/Locomotion");
-graph.Resolve<AnimationMixerPlayable>("Locomotion");
+builder.Resolve<AnimationMixerPlayable>("Character/Locomotion");
+builder.Resolve<AnimationMixerPlayable>("Locomotion");
 ```
 
 Path rules:
@@ -296,7 +308,8 @@ when it is not `null`.
 
 ## Project Extensions
 
-Project-specific extension methods should stay thin and build on the core API.
+Project-specific extension methods should stay thin and build on `FluentBuilder`
+or `TopologyScope`, not on `PlayableGraph`.
 Invoke extensions where their result is consumed:
 
 ```csharp
@@ -312,7 +325,9 @@ an already declared fluent edge.
 
 ## Validation
 
-`Build(...)` validates fluent declarations before returning the graph.
+`Build(...)` validates fluent declarations before returning the graph. Fluent
+metadata lookup remains on the actual `FluentBuilder` instance until it is
+disposed.
 
 Validation fails when:
 
@@ -332,7 +347,8 @@ not declared through Fluent API is allowed.
 ## Multi-Output Example
 
 ```csharp
-FluentBuilder.Create(existingGraph)
+using FluentBuilder builder = FluentBuilder.Create(existingGraph);
+builder
   .Output(animator, out var output)
 
   .Input(output)

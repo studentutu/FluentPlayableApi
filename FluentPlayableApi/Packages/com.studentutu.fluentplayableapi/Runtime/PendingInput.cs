@@ -3,7 +3,7 @@
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-namespace Studentutu.Fluentplayableapi
+namespace Fluentplayableapi
 {
     /// <summary>
     /// Tracks the destination waiting for the next authored playable.

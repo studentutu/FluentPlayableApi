@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Studentutu.Fluentplayableapi;
+using Fluentplayableapi;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -20,6 +20,7 @@ public class AnimationGraphExample : MonoBehaviour
     public bool Manual = false;
     public bool RecreateGraph = false;
 
+    private FluentBuilder _builder;
     private PlayableGraph _graph;
 
     private void OnValidate()
@@ -48,7 +49,7 @@ public class AnimationGraphExample : MonoBehaviour
             return;
         
         // Same PlayableGraph under the hood.
-        var builder = FluentBuilder.Create("AnimationGraphExample")
+        _builder = FluentBuilder.Create("AnimationGraphExample")
             .Output(_animator, out var output)
             .Input(output)
             .WithMixer<AnimationMixerPlayable>(2, out var rootWithFullBodyMixer, "RootWithFullBodyMixer")
@@ -72,14 +73,20 @@ public class AnimationGraphExample : MonoBehaviour
             .WithMixer<AnimationMixerPlayable>(CountValidClips(FullBody), out var fullBodySlot, "FullBodySlot")
             .WithWeight(rootWithFullBodyMixer, "FullBodySlot", 0f);
 
-        AddClipsToSlot(builder, upperBodySlot, UpperBody, "UpperBody", PickRandomValidClipIndex(UpperBody));
-        AddClipsToSlot(builder, fullBodySlot, FullBody, "FullBody", enabledInput: -1);
+        AddClipsToSlot(_builder, upperBodySlot, UpperBody, "UpperBody", PickRandomValidClipIndex(UpperBody));
+        AddClipsToSlot(_builder, fullBodySlot, FullBody, "FullBody", enabledInput: -1);
 
-        _graph = builder.Build(play: !Manual); // validates here.
+        _graph = _builder.Build(play: !Manual); // validates here.
     }
 
     private void OnDestroy()
     {
+        if (_builder != null)
+        {
+            _builder.Dispose();
+            _builder = null;
+        }
+
         if(!_graph.IsValid())
             return;
         

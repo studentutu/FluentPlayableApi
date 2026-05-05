@@ -6,22 +6,27 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-namespace Studentutu.Fluentplayableapi
+namespace Fluentplayableapi
 {
     /// <summary>
     /// Declares, connects, names, and validates Unity playables through a compact fluent API.
     /// </summary>
-    public sealed class FluentBuilder
+    public sealed class FluentBuilder : IDisposable
     {
         private readonly FluentGraphRegistry _registry = new FluentGraphRegistry();
         private readonly List<DeclaredInput> _declaredInputs = new List<DeclaredInput>();
         private readonly HashSet<DestinationInputKey> _declaredDestinationInputs = new HashSet<DestinationInputKey>();
         private readonly HashSet<SourceOutputKey> _claimedSourceOutputs = new HashSet<SourceOutputKey>();
         private readonly HashSet<PlayableOutputHandle> _claimedOutputs = new HashSet<PlayableOutputHandle>();
-        private readonly Dictionary<PlayableHandle, List<PlayableHandle>> _sourceInputsByDestination = new Dictionary<PlayableHandle, List<PlayableHandle>>();
+
+        private readonly Dictionary<PlayableHandle, List<PlayableHandle>> _sourceInputsByDestination =
+            new Dictionary<PlayableHandle, List<PlayableHandle>>();
+
         private readonly List<PlayableHandle> _outputRoots = new List<PlayableHandle>();
         private readonly HashSet<PendingInput> _suspendedPendingInputs = new HashSet<PendingInput>();
         private PendingInput? _pendingInput;
+        private bool _built;
+        private bool _disposed;
 
         private FluentBuilder(PlayableGraph graph)
         {
@@ -57,8 +62,10 @@ namespace Studentutu.Fluentplayableapi
         /// <summary>
         /// Creates an animation output owned by the graph.
         /// </summary>
-        public FluentBuilder Output(Animator animator, out AnimationPlayableOutput output, string name = "AnimationOutput")
+        public FluentBuilder Output(Animator animator, out AnimationPlayableOutput output,
+            string name = "AnimationOutput")
         {
+            EnsureNotDisposed();
             if (animator == null)
             {
                 throw new ArgumentNullException(nameof(animator));
@@ -73,6 +80,7 @@ namespace Studentutu.Fluentplayableapi
         /// </summary>
         public FluentBuilder Input(AnimationPlayableOutput output, int index = 0)
         {
+            EnsureNotDisposed();
             DeclareOutputInput(output, index);
             return this;
         }
@@ -83,6 +91,7 @@ namespace Studentutu.Fluentplayableapi
         public FluentBuilder Input<TDestination>(TDestination destination, int index, string? name = null)
             where TDestination : struct, IPlayable
         {
+            EnsureNotDisposed();
             DeclarePlayableInput(destination, index, name);
             return this;
         }
@@ -93,6 +102,7 @@ namespace Studentutu.Fluentplayableapi
         public FluentBuilder AddInput<TDestination>(TDestination destination, string name, out int index)
             where TDestination : struct, IPlayable
         {
+            EnsureNotDisposed();
             index = destination.GetInputCount();
             destination.SetInputCount(index + 1);
             DeclarePlayableInput(destination, index, name);
@@ -104,6 +114,7 @@ namespace Studentutu.Fluentplayableapi
         /// </summary>
         public TopologyScope Scope(string path)
         {
+            EnsureNotDisposed();
             string normalizedPath = TopologyPath.Normalize(path);
             return BeginScope(normalizedPath);
         }
@@ -111,9 +122,11 @@ namespace Studentutu.Fluentplayableapi
         /// <summary>
         /// Creates and optionally registers an animation mixer or layer mixer.
         /// </summary>
-        public FluentBuilder WithMixer<TMixer>(int inputCount, out TMixer mixer, string? name = null, int outputCount = 1)
+        public FluentBuilder WithMixer<TMixer>(int inputCount, out TMixer mixer, string? name = null,
+            int outputCount = 1)
             where TMixer : struct, IPlayable
         {
+            EnsureNotDisposed();
             mixer = CreateMixerWithGraph<TMixer>(inputCount, outputCount);
             RegisterAndAttachCreatedPlayable(mixer, name, null);
             return this;
@@ -122,8 +135,10 @@ namespace Studentutu.Fluentplayableapi
         /// <summary>
         /// Creates and optionally registers an animation clip playable with safe defaults.
         /// </summary>
-        public FluentBuilder WithClip(AnimationClip clip, out AnimationClipPlayable playable, string? name = null, bool paused = true)
+        public FluentBuilder WithClip(AnimationClip clip, out AnimationClipPlayable playable, string? name = null,
+            bool paused = true)
         {
+            EnsureNotDisposed();
             if (clip == null)
             {
                 throw new ArgumentNullException(nameof(clip));
@@ -155,6 +170,7 @@ namespace Studentutu.Fluentplayableapi
             string? name = null)
             where TBehaviour : PlayableBehaviour, new()
         {
+            EnsureNotDisposed();
             ValidateCounts(inputCount, outputCount);
             playable = ScriptPlayable<TBehaviour>.Create(Graph, inputCount);
             playable.SetOutputCount(outputCount);
@@ -171,6 +187,7 @@ namespace Studentutu.Fluentplayableapi
             string? name = null)
             where TPlayable : struct, IPlayable
         {
+            EnsureNotDisposed();
             if (factory == null)
             {
                 throw new ArgumentNullException(nameof(factory));
@@ -193,6 +210,7 @@ namespace Studentutu.Fluentplayableapi
         public FluentBuilder WithPlayable<TPlayable>(TPlayable playable, int sourceOutputPort = 0)
             where TPlayable : struct, IPlayable
         {
+            EnsureNotDisposed();
             AttachExistingPlayable(playable, sourceOutputPort);
             return this;
         }
@@ -203,6 +221,7 @@ namespace Studentutu.Fluentplayableapi
         public FluentBuilder WithPlayable<TPlayable>(string key, out TPlayable playable, int sourceOutputPort = 0)
             where TPlayable : struct, IPlayable
         {
+            EnsureNotDisposed();
             playable = _registry.Resolve<TPlayable>(key);
             if (_pendingInput != null)
             {
@@ -219,6 +238,7 @@ namespace Studentutu.Fluentplayableapi
         public FluentBuilder WithWeight<TDestination>(TDestination destination, int input, float weight)
             where TDestination : struct, IPlayable
         {
+            EnsureNotDisposed();
             ValidatePlayableInputIndex(destination, input);
             destination.SetInputWeight(input, weight);
             return this;
@@ -230,6 +250,7 @@ namespace Studentutu.Fluentplayableapi
         public FluentBuilder WithWeight<TDestination>(TDestination destination, string inputName, float weight)
             where TDestination : struct, IPlayable
         {
+            EnsureNotDisposed();
             return WithWeight(destination, _registry.InputIndex(destination, inputName), weight);
         }
 
@@ -239,6 +260,7 @@ namespace Studentutu.Fluentplayableapi
         public FluentBuilder WithWeight<TOutput>(TOutput output, float weight)
             where TOutput : struct, IPlayableOutput
         {
+            EnsureNotDisposed();
             output.SetWeight(weight);
             return this;
         }
@@ -246,8 +268,10 @@ namespace Studentutu.Fluentplayableapi
         /// <summary>
         /// Configures an animation layer mixer input as override or additive and optionally assigns an avatar mask.
         /// </summary>
-        public FluentBuilder Layer(AnimationLayerMixerPlayable layerMixer, int input, bool additive = false, AvatarMask? mask = null)
+        public FluentBuilder Layer(AnimationLayerMixerPlayable layerMixer, int input, bool additive = false,
+            AvatarMask? mask = null)
         {
+            EnsureNotDisposed();
             ValidatePlayableInputIndex(layerMixer, input);
             layerMixer.SetLayerAdditive((uint)input, additive);
             if (mask != null)
@@ -259,22 +283,80 @@ namespace Studentutu.Fluentplayableapi
         }
 
         /// <summary>
-        /// Validates fluent declarations, registers metadata, and optionally starts the graph.
+        /// Validates fluent declarations and optionally starts the graph.
         /// </summary>
         public PlayableGraph Build(bool play = true)
         {
+            EnsureNotDisposed();
             ValidateBuild();
-            FluentGraphStore.Register(Graph, _registry);
             if (play)
             {
                 Graph.Play();
             }
 
+            _built = true;
             return Graph;
+        }
+
+        /// <summary>
+        /// Resolves a playable by exact path or unique short name from this builder instance.
+        /// </summary>
+        public TPlayable Resolve<TPlayable>(string key)
+            where TPlayable : struct, IPlayable
+        {
+            EnsureNotDisposed();
+            EnsureBuilt();
+            return _registry.Resolve<TPlayable>(key);
+        }
+
+        /// <summary>
+        /// Resolves a named input index for a destination playable from this builder instance.
+        /// </summary>
+        public int InputIndex<TPlayable>(TPlayable destination, string inputName)
+            where TPlayable : struct, IPlayable
+        {
+            EnsureNotDisposed();
+            EnsureBuilt();
+            return _registry.InputIndex(destination, inputName);
+        }
+
+        /// <summary>
+        /// Resolves a named input index by destination node key from this builder instance.
+        /// </summary>
+        public int InputIndex(string nodeKey, string inputName)
+        {
+            EnsureNotDisposed();
+            EnsureBuilt();
+            return _registry.InputIndex(nodeKey, inputName);
+        }
+
+        /// <summary>
+        /// Clears fluent metadata owned by this builder instance.
+        /// </summary>
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _pendingInput = null;
+            _declaredInputs.Clear();
+            _declaredDestinationInputs.Clear();
+            _claimedSourceOutputs.Clear();
+            _claimedOutputs.Clear();
+            _sourceInputsByDestination.Clear();
+            _outputRoots.Clear();
+            _suspendedPendingInputs.Clear();
+            _registry.Clear();
+            _built = false;
+
+            _disposed = true;
         }
 
         internal TopologyScope BeginScope(string normalizedPath)
         {
+            EnsureNotDisposed();
             _registry.RegisterScopePath(normalizedPath);
             PendingInput? parentPendingInput = _pendingInput;
             if (parentPendingInput != null)
@@ -289,6 +371,7 @@ namespace Studentutu.Fluentplayableapi
         internal void CompileScope<TPlayable>(TopologyScope scope, TPlayable root)
             where TPlayable : struct, IPlayable
         {
+            EnsureNotDisposed();
             if (_pendingInput != null)
             {
                 throw new InvalidOperationException($"Scope '{scope.Path}' has an unconsumed pending input.");
@@ -304,6 +387,7 @@ namespace Studentutu.Fluentplayableapi
 
         internal void DeclareOutputInput(AnimationPlayableOutput output, int sourceOutputPort)
         {
+            EnsureNotDisposed();
             if (!output.IsOutputValid())
             {
                 throw new ArgumentException("Output must be valid.", nameof(output));
@@ -311,7 +395,8 @@ namespace Studentutu.Fluentplayableapi
 
             if (sourceOutputPort < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(sourceOutputPort), "Source output port must be non-negative.");
+                throw new ArgumentOutOfRangeException(nameof(sourceOutputPort),
+                    "Source output port must be non-negative.");
             }
 
             EnsureNoPendingInput();
@@ -329,6 +414,7 @@ namespace Studentutu.Fluentplayableapi
         internal void DeclarePlayableInput<TDestination>(TDestination destination, int index, string? name)
             where TDestination : struct, IPlayable
         {
+            EnsureNotDisposed();
             EnsureValidPlayable(destination, nameof(destination));
             ValidatePlayableInputIndex(destination, index);
             EnsureNoPendingInput();
@@ -352,6 +438,7 @@ namespace Studentutu.Fluentplayableapi
         internal void RegisterAndAttachCreatedPlayable<TPlayable>(TPlayable playable, string? name, string? scopePath)
             where TPlayable : struct, IPlayable
         {
+            EnsureNotDisposed();
             EnsureValidPlayable(playable, nameof(playable));
             if (name != null)
             {
@@ -369,6 +456,7 @@ namespace Studentutu.Fluentplayableapi
         internal void AttachExistingPlayable<TPlayable>(TPlayable playable, int sourceOutputPort)
             where TPlayable : struct, IPlayable
         {
+            EnsureNotDisposed();
             EnsureValidPlayable(playable, nameof(playable));
             if (_pendingInput == null)
             {
@@ -382,6 +470,7 @@ namespace Studentutu.Fluentplayableapi
         internal void WithResolvedPlayable<TPlayable>(string key, out TPlayable playable, int sourceOutputPort)
             where TPlayable : struct, IPlayable
         {
+            EnsureNotDisposed();
             playable = _registry.Resolve<TPlayable>(key);
             if (_pendingInput != null)
             {
@@ -390,7 +479,8 @@ namespace Studentutu.Fluentplayableapi
             }
         }
 
-        private void AttachPlayableToPending<TPlayable>(TPlayable playable, int requestedSourceOutputPort, PendingInput pendingInput)
+        private void AttachPlayableToPending<TPlayable>(TPlayable playable, int requestedSourceOutputPort,
+            PendingInput pendingInput)
             where TPlayable : struct, IPlayable
         {
             int sourceOutputPort = pendingInput.IsOutput ? pendingInput.SourceOutputPort : requestedSourceOutputPort;
@@ -405,7 +495,8 @@ namespace Studentutu.Fluentplayableapi
             bool connected = pendingInput.Attach(Graph, playable, sourceOutputPort);
             if (!connected)
             {
-                throw new InvalidOperationException($"Unity rejected connection to destination input {pendingInput.DestinationInput}.");
+                throw new InvalidOperationException(
+                    $"Unity rejected connection to destination input {pendingInput.DestinationInput}.");
             }
 
             if (pendingInput.IsOutput)
@@ -470,7 +561,8 @@ namespace Studentutu.Fluentplayableapi
             {
                 if (!reachable.Contains(registeredPlayable))
                 {
-                    throw new InvalidOperationException("A registered playable is unreachable from every authored output.");
+                    throw new InvalidOperationException(
+                        "A registered playable is unreachable from every authored output.");
                 }
             }
         }
@@ -494,7 +586,8 @@ namespace Studentutu.Fluentplayableapi
                 return (TMixer)(object)mixer;
             }
 
-            throw new NotSupportedException($"Mixer type {typeof(TMixer).Name} is not supported. Use AnimationMixerPlayable or AnimationLayerMixerPlayable.");
+            throw new NotSupportedException(
+                $"Mixer type {typeof(TMixer).Name} is not supported. Use AnimationMixerPlayable or AnimationLayerMixerPlayable.");
         }
 
         private static void ValidateCounts(int inputCount, int outputCount)
@@ -524,7 +617,8 @@ namespace Studentutu.Fluentplayableapi
         {
             if (index < 0 || index >= playable.GetInputCount())
             {
-                throw new ArgumentOutOfRangeException(nameof(index), $"Input index {index} is outside input count {playable.GetInputCount()}.");
+                throw new ArgumentOutOfRangeException(nameof(index),
+                    $"Input index {index} is outside input count {playable.GetInputCount()}.");
             }
         }
 
@@ -533,7 +627,8 @@ namespace Studentutu.Fluentplayableapi
         {
             if (sourceOutputPort < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(sourceOutputPort), "Source output port must be non-negative.");
+                throw new ArgumentOutOfRangeException(nameof(sourceOutputPort),
+                    "Source output port must be non-negative.");
             }
 
             if (sourceOutputPort >= playable.GetOutputCount())
@@ -552,15 +647,34 @@ namespace Studentutu.Fluentplayableapi
             }
         }
 
+        private void EnsureBuilt()
+        {
+            if (!_built)
+            {
+                throw new InvalidOperationException("Build the fluent builder before querying fluent metadata.");
+            }
+        }
+
+        private void EnsureNotDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(nameof(FluentBuilder));
+            }
+        }
+
         private readonly struct DestinationInputKey : IEquatable<DestinationInputKey>
         {
             private readonly PlayableHandle _destination;
             private readonly int _input;
+            private readonly int _hashCode;
 
             public DestinationInputKey(PlayableHandle destination, int input)
             {
                 _destination = destination;
                 _input = input;
+
+                _hashCode = (_destination.GetHashCode() * 397) ^ _input;
             }
 
             public bool Equals(DestinationInputKey other)
@@ -575,10 +689,7 @@ namespace Studentutu.Fluentplayableapi
 
             public override int GetHashCode()
             {
-                unchecked
-                {
-                    return (_destination.GetHashCode() * 397) ^ _input;
-                }
+                return _hashCode;
             }
         }
 
@@ -586,11 +697,14 @@ namespace Studentutu.Fluentplayableapi
         {
             private readonly PlayableHandle _source;
             private readonly int _output;
+            private readonly int _hashCode;
 
             public SourceOutputKey(PlayableHandle source, int output)
             {
                 _source = source;
                 _output = output;
+
+                _hashCode = (_source.GetHashCode() * 397) ^ _output;
             }
 
             public bool Equals(SourceOutputKey other)
@@ -605,10 +719,7 @@ namespace Studentutu.Fluentplayableapi
 
             public override int GetHashCode()
             {
-                unchecked
-                {
-                    return (_source.GetHashCode() * 397) ^ _output;
-                }
+                return _hashCode;
             }
         }
     }

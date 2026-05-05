@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace Studentutu.Fluentplayableapi
+namespace Fluentplayableapi
 {
     /// <summary>
     /// Tracks one fluent-declared input until it is consumed.

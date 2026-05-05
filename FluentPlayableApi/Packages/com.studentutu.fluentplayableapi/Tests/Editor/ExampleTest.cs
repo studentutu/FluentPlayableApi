@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-namespace Studentutu.Fluentplayableapi.Tests
+namespace Fluentplayableapi.Tests
 {
     public class ExampleTest
     {
@@ -14,11 +14,13 @@ namespace Studentutu.Fluentplayableapi.Tests
         public void BuildCreatesReachableGraphAndRegistersLookup()
         {
             GameObject animatorObject = CreateAnimatorObject(out Animator animator);
+            FluentBuilder? builder = null;
             PlayableGraph graph = default;
 
             try
             {
-                graph = FluentBuilder.Create("LookupGraph")
+                builder = FluentBuilder.Create("LookupGraph");
+                graph = builder
                     .Output(animator, out AnimationPlayableOutput output)
                     .Input(output)
                     .WithMixer<AnimationMixerPlayable>(1, out AnimationMixerPlayable root, "Root")
@@ -30,8 +32,8 @@ namespace Studentutu.Fluentplayableapi.Tests
 
                 Assert.IsTrue(graph.IsValid());
                 Assert.IsFalse(graph.IsPlaying());
-                Assert.AreEqual(root.GetHandle(), graph.Resolve<AnimationMixerPlayable>("Root").GetHandle());
-                Assert.AreEqual(0, graph.InputIndex("Root", "Clip"));
+                Assert.AreEqual(root.GetHandle(), builder.Resolve<AnimationMixerPlayable>("Root").GetHandle());
+                Assert.AreEqual(0, builder.InputIndex("Root", "Clip"));
                 Assert.AreEqual(1f, root.GetInputWeight(0));
                 Assert.AreEqual(0.75f, output.GetWeight());
                 Assert.AreEqual(PlayState.Paused, clipPlayable.GetPlayState());
@@ -39,6 +41,7 @@ namespace Studentutu.Fluentplayableapi.Tests
             }
             finally
             {
+                builder?.Dispose();
                 DestroyGraphAndObject(graph, animatorObject);
             }
         }
@@ -47,20 +50,50 @@ namespace Studentutu.Fluentplayableapi.Tests
         public void BuildPlayFlagControlsGraphPlayState()
         {
             PlayableGraph graph = PlayableGraph.Create("ExistingGraph");
+            FluentBuilder? builder = null;
 
             try
             {
-                PlayableGraph builtGraph = FluentBuilder.Create(graph).Build(play: true);
+                builder = FluentBuilder.Create(graph);
+                PlayableGraph builtGraph = builder.Build(play: true);
 
                 Assert.AreEqual(graph.GetHashCode(), builtGraph.GetHashCode());
                 Assert.IsTrue(builtGraph.IsPlaying());
             }
             finally
             {
+                builder?.Dispose();
                 if (graph.IsValid())
                 {
                     graph.Destroy();
                 }
+            }
+        }
+
+        [Test]
+        public void DisposeClearsBuilderWithoutDestroyingGraph()
+        {
+            GameObject animatorObject = CreateAnimatorObject(out Animator animator);
+            FluentBuilder builder = FluentBuilder.Create("DisposeGraph");
+            PlayableGraph graph = default;
+
+            try
+            {
+                graph = builder
+                    .Output(animator, out AnimationPlayableOutput output)
+                    .Input(output)
+                    .WithMixer<AnimationMixerPlayable>(0, out _, "Root")
+                    .Build(play: false);
+
+                builder.Dispose();
+
+                Assert.IsTrue(graph.IsValid());
+                Assert.Throws<ObjectDisposedException>(() => builder.Resolve<AnimationMixerPlayable>("Root"));
+            }
+            finally
+            {
+                builder.Dispose();
+                DestroyGraphAndObject(graph, animatorObject);
             }
         }
 
@@ -82,9 +115,11 @@ namespace Studentutu.Fluentplayableapi.Tests
             }
             finally
             {
-                if (builder.Graph.IsValid())
+                PlayableGraph graph = builder.Graph;
+                builder.Dispose();
+                if (graph.IsValid())
                 {
-                    builder.Graph.Destroy();
+                    graph.Destroy();
                 }
             }
         }
@@ -103,9 +138,11 @@ namespace Studentutu.Fluentplayableapi.Tests
             }
             finally
             {
-                if (builder.Graph.IsValid())
+                PlayableGraph graph = builder.Graph;
+                builder.Dispose();
+                if (graph.IsValid())
                 {
-                    builder.Graph.Destroy();
+                    graph.Destroy();
                 }
             }
         }
@@ -130,9 +167,11 @@ namespace Studentutu.Fluentplayableapi.Tests
             }
             finally
             {
-                if (builder.Graph.IsValid())
+                PlayableGraph graph = builder.Graph;
+                builder.Dispose();
+                if (graph.IsValid())
                 {
-                    builder.Graph.Destroy();
+                    graph.Destroy();
                 }
 
                 UnityEngine.Object.DestroyImmediate(animatorObject);
@@ -143,11 +182,13 @@ namespace Studentutu.Fluentplayableapi.Tests
         public void ScopeLookupRequiresExactPathWhenShortNameIsAmbiguous()
         {
             GameObject animatorObject = CreateAnimatorObject(out Animator animator);
+            FluentBuilder? builder = null;
             PlayableGraph graph = default;
 
             try
             {
-                graph = FluentBuilder.Create("ScopeLookupGraph")
+                builder = FluentBuilder.Create("ScopeLookupGraph");
+                graph = builder
                     .Output(animator, out AnimationPlayableOutput output)
                     .Input(output)
                     .WithMixer<AnimationMixerPlayable>(2, out AnimationMixerPlayable root, "Root")
@@ -161,13 +202,14 @@ namespace Studentutu.Fluentplayableapi.Tests
                         .CompileAs(mixerB)
                     .Build(play: false);
 
-                Assert.AreEqual(mixerA.GetHandle(), graph.Resolve<AnimationMixerPlayable>("A/Mixer").GetHandle());
-                Assert.AreEqual(mixerB.GetHandle(), graph.Resolve<AnimationMixerPlayable>("B/Mixer").GetHandle());
-                Assert.Throws<InvalidOperationException>(() => graph.Resolve<AnimationMixerPlayable>("Mixer"));
-                Assert.Throws<InvalidOperationException>(() => graph.Resolve<AnimationLayerMixerPlayable>("A/Mixer"));
+                Assert.AreEqual(mixerA.GetHandle(), builder.Resolve<AnimationMixerPlayable>("A/Mixer").GetHandle());
+                Assert.AreEqual(mixerB.GetHandle(), builder.Resolve<AnimationMixerPlayable>("B/Mixer").GetHandle());
+                Assert.Throws<InvalidOperationException>(() => builder.Resolve<AnimationMixerPlayable>("Mixer"));
+                Assert.Throws<InvalidOperationException>(() => builder.Resolve<AnimationLayerMixerPlayable>("A/Mixer"));
             }
             finally
             {
+                builder?.Dispose();
                 DestroyGraphAndObject(graph, animatorObject);
             }
         }
@@ -186,14 +228,16 @@ namespace Studentutu.Fluentplayableapi.Tests
 
                 Assert.AreEqual(0, generatedIndex);
                 Assert.AreEqual(1, mixer.GetInputCount());
-                Assert.AreEqual(0, builder.Graph.InputIndex(mixer, "Generated"));
+                Assert.AreEqual(0, builder.InputIndex(mixer, "Generated"));
                 Assert.Throws<InvalidOperationException>(() => builder.Input(mixer, generatedIndex, "Other"));
             }
             finally
             {
-                if (builder.Graph.IsValid())
+                PlayableGraph graph = builder.Graph;
+                builder.Dispose();
+                if (graph.IsValid())
                 {
-                    builder.Graph.Destroy();
+                    graph.Destroy();
                 }
             }
         }
@@ -213,9 +257,11 @@ namespace Studentutu.Fluentplayableapi.Tests
             }
             finally
             {
-                if (builder.Graph.IsValid())
+                PlayableGraph graph = builder.Graph;
+                builder.Dispose();
+                if (graph.IsValid())
                 {
-                    builder.Graph.Destroy();
+                    graph.Destroy();
                 }
             }
         }

@@ -2,21 +2,28 @@
 
 using System;
 using System.Collections.Generic;
-using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-namespace Studentutu.Fluentplayableapi
+namespace Fluentplayableapi
 {
     /// <summary>
     /// Stores authored fluent graph paths and named input indices.
     /// </summary>
-    public sealed class FluentGraphRegistry
+    internal sealed class FluentGraphRegistry
     {
-        private readonly Dictionary<string, NodeRecord> _nodesByPath = new Dictionary<string, NodeRecord>(StringComparer.Ordinal);
-        private readonly Dictionary<string, List<NodeRecord>> _nodesByShortName = new Dictionary<string, List<NodeRecord>>(StringComparer.Ordinal);
+        private readonly Dictionary<string, NodeRecord> _nodesByPath =
+            new Dictionary<string, NodeRecord>(StringComparer.Ordinal);
+
+        private readonly Dictionary<string, List<NodeRecord>> _nodesByShortName =
+            new Dictionary<string, List<NodeRecord>>(StringComparer.Ordinal);
+
         private readonly HashSet<string> _reservedScopePaths = new HashSet<string>(StringComparer.Ordinal);
-        private readonly Dictionary<PlayableHandle, Dictionary<string, int>> _inputNamesByDestination = new Dictionary<PlayableHandle, Dictionary<string, int>>();
-        private readonly Dictionary<PlayableHandle, Dictionary<int, string>> _inputIndicesByDestination = new Dictionary<PlayableHandle, Dictionary<int, string>>();
+
+        private readonly Dictionary<PlayableHandle, Dictionary<string, int>> _inputNamesByDestination =
+            new Dictionary<PlayableHandle, Dictionary<string, int>>();
+
+        private readonly Dictionary<PlayableHandle, Dictionary<int, string>> _inputIndicesByDestination =
+            new Dictionary<PlayableHandle, Dictionary<int, string>>();
 
         /// <summary>
         /// Registers a named playable under an exact path.
@@ -91,7 +98,8 @@ namespace Studentutu.Fluentplayableapi
 
             if (names.TryGetValue(name, out int existingIndex) && existingIndex != index)
             {
-                throw new InvalidOperationException($"Input name '{name}' is already registered for input {existingIndex}.");
+                throw new InvalidOperationException(
+                    $"Input name '{name}' is already registered for input {existingIndex}.");
             }
 
             if (indices.TryGetValue(index, out string existingName) && existingName != name)
@@ -117,14 +125,6 @@ namespace Studentutu.Fluentplayableapi
             }
 
             return (TPlayable)record.BoxedPlayable;
-        }
-
-        /// <summary>
-        /// Resolves a playable by exact path or unique short name without a typed handle.
-        /// </summary>
-        public Playable ResolveUntyped(string key)
-        {
-            return ToPlayable(ResolveRecord(key));
         }
 
         /// <summary>
@@ -169,6 +169,15 @@ namespace Studentutu.Fluentplayableapi
             }
         }
 
+        internal void Clear()
+        {
+            _nodesByPath.Clear();
+            _nodesByShortName.Clear();
+            _reservedScopePaths.Clear();
+            _inputNamesByDestination.Clear();
+            _inputIndicesByDestination.Clear();
+        }
+
         internal PlayableHandle ResolveHandle(string key)
         {
             return ResolveRecord(key).Handle;
@@ -187,7 +196,8 @@ namespace Studentutu.Fluentplayableapi
                 throw new InvalidOperationException($"Path '{path}' is already registered.");
             }
 
-            var record = new NodeRecord(path, TopologyPath.NameOf(path), playable, playable.GetHandle(), typeof(TPlayable));
+            var record = new NodeRecord(path, TopologyPath.NameOf(path), playable, playable.GetHandle(),
+                typeof(TPlayable));
             _nodesByPath.Add(path, record);
 
             if (!_nodesByShortName.TryGetValue(record.ShortName, out List<NodeRecord> records))
@@ -225,39 +235,10 @@ namespace Studentutu.Fluentplayableapi
             return records[0];
         }
 
-        private static Playable ToPlayable(NodeRecord record)
-        {
-            if (record.BoxedPlayable is Playable playable)
-            {
-                return playable;
-            }
-
-            if (record.BoxedPlayable is AnimationMixerPlayable mixer)
-            {
-                return mixer;
-            }
-
-            if (record.BoxedPlayable is AnimationLayerMixerPlayable layerMixer)
-            {
-                return layerMixer;
-            }
-
-            if (record.BoxedPlayable is AnimationClipPlayable clip)
-            {
-                return clip;
-            }
-
-            if (record.BoxedPlayable is AnimationScriptPlayable script)
-            {
-                return script;
-            }
-
-            throw new NotSupportedException($"Untyped playable resolution is not supported for {record.PlayableType.Name}.");
-        }
-
         private readonly struct NodeRecord
         {
-            public NodeRecord(string path, string shortName, object boxedPlayable, PlayableHandle handle, Type playableType)
+            public NodeRecord(string path, string shortName, object boxedPlayable, PlayableHandle handle,
+                Type playableType)
             {
                 Path = path;
                 ShortName = shortName;
