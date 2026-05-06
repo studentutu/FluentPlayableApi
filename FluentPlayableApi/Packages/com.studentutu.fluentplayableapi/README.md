@@ -24,6 +24,12 @@ Playable API keeps topology visible and maintainable in code.
 The API is intentionally small. It does not replace Unity's graph types, own
 graph lifetime, or add project-specific animation concepts.
 
+Fluent API for playable graph helps to read, maintain and quickly change the topology.
+
+Verification helps to ensure and catch mistakes early. See [Validation](#validation).
+
+Custom extension is easy to make and helps organize logic into a building blocks. See [Project Extensions](#project-extensions).
+
 ## Install
 
 The distributable Unity package lives in this repository at

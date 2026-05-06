@@ -13,15 +13,26 @@
 
 ## Summary
 
-Fluent Playable API is a compact declaration layer over Unity's `PlayableGraph`.
-It helps create, connect, name, resolve, and validate Unity playables while still
+Fluent Playable API is a compact declaration layer over Unity's `PlayableGraph` (Playable API).
+It helps create, connect, name, resolve, and verify Unity playables while still
 returning a normal Unity `PlayableGraph`.
 
-It addresses a graph authoring problem: Unity provides a flat view, while Fluent
+The builder does not own the graph; it only provides helper API to author and
+verify it.
+
+It addresses a current issue with Unity graph authoring problem: Unity provides a flat view, while Fluent
 Playable API keeps topology visible and maintainable in code.
 
 The API is intentionally small. It does not replace Unity's graph types, own
 graph lifetime, or add project-specific animation concepts.
+
+Fluent API for playable graph helps to read, maintain and quickly change the topology.
+
+Verification helps to ensure and catch mistakes early. See [Validation](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi/README.md#validation).
+
+Custom extension is easy to make and helps organize logic into a building blocks. See [Project Extensions](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi/README.md#project-extensions).
+
+Fluent API for playable graph helps read, maintain and quickly change the topology.
 
 This repository hosts the development environment and samples for the underlying
 package: [Packages/com.studentutu.fluentplayableapi/README.md](FluentPlayableApi/Packages/com.studentutu.fluentplayableapi/README.md).
