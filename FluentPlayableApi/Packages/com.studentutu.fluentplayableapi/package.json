@@ -1,10 +1,10 @@
 {
   "name": "com.studentutu.fluentplayableapi",
-  "displayName": "FluentPlayableApi",
-  "version": "1.0.3",
+  "displayName": "Fluent Playable API",
+  "version": "1.0.4",
   "unity": "6000.0",
   "unityRelease": "1f1",
-  "description": "Fluent API for Unity Playable API with verification",
+  "description": "Fluent Playable API is a compact declaration layer over Unity's `PlayableGraph` (Playable API).\r\nIt helps create, connect, name, resolve, and verify Unity playables while still\r\nreturning a normal Unity `PlayableGraph`.",
   "author": {
     "name": "Roman Fedorov",
     "url": "https://github.com/studentutu/FluentPlayableApi",

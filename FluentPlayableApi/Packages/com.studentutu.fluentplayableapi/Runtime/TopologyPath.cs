@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Fluentplayableapi
+namespace FluentPlayableApi
 {
     /// <summary>
     /// Normalizes fluent graph lookup paths.

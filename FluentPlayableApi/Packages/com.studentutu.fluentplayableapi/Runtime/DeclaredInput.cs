@@ -1,6 +1,6 @@
 #nullable enable
 
-namespace Fluentplayableapi
+namespace FluentPlayableApi
 {
     /// <summary>
     /// Tracks one fluent-declared input until it is consumed.

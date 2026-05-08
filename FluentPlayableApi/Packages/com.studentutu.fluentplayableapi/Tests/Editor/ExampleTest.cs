@@ -4,9 +4,10 @@ using System;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.Audio;
 using UnityEngine.Playables;
 
-namespace Fluentplayableapi.Tests
+namespace FluentPlayableApi.Tests
 {
     public class ExampleTest
     {
@@ -312,6 +313,76 @@ namespace Fluentplayableapi.Tests
                 {
                     graph.Destroy();
                 }
+            }
+        }
+
+        [Test]
+        public void GenericOutputFactorySupportsScriptPlayableOutput()
+        {
+            FluentBuilder builder = FluentBuilder.Create("ScriptOutputGraph");
+            PlayableGraph graph = default;
+
+            try
+            {
+                graph = builder
+                    .Output(playableGraph => ScriptPlayableOutput.Create(playableGraph, "ScriptOutput"),
+                        out ScriptPlayableOutput output)
+                    .Input(output)
+                    .WithScript<TestPlayableBehaviour>(
+                        out ScriptPlayable<TestPlayableBehaviour> script,
+                        name: "Script")
+                    .WithWeight(output, 0.5f)
+                    .Verify();
+
+                Assert.IsTrue(graph.IsValid());
+                Assert.AreEqual(script.GetHandle(), output.GetSourcePlayable().GetHandle());
+                Assert.AreEqual(0, output.GetSourceOutputPort());
+                Assert.AreEqual(0.5f, output.GetWeight());
+            }
+            finally
+            {
+                graph = builder.Graph;
+                builder.Dispose();
+                if (graph.IsValid())
+                {
+                    graph.Destroy();
+                }
+            }
+        }
+
+        [Test]
+        public void GenericOutputInputSupportsAudioPlayableOutput()
+        {
+            GameObject audioObject = new GameObject("FluentBuilderTestsAudio");
+            AudioSource audioSource = audioObject.AddComponent<AudioSource>();
+            FluentBuilder builder = FluentBuilder.Create("AudioOutputGraph");
+            PlayableGraph graph = default;
+
+            try
+            {
+                graph = builder
+                    .Output(playableGraph => AudioPlayableOutput.Create(playableGraph, "AudioOutput", audioSource),
+                        out AudioPlayableOutput output)
+                    .Input(output)
+                    .WithPlayable(
+                        playableGraph => AudioMixerPlayable.Create(playableGraph, 0),
+                        out AudioMixerPlayable mixer,
+                        name: "AudioMixer")
+                    .Verify();
+
+                Assert.IsTrue(graph.IsValid());
+                Assert.AreEqual(mixer.GetHandle(), output.GetSourcePlayable().GetHandle());
+            }
+            finally
+            {
+                graph = builder.Graph;
+                builder.Dispose();
+                if (graph.IsValid())
+                {
+                    graph.Destroy();
+                }
+
+                UnityEngine.Object.DestroyImmediate(audioObject);
             }
         }
 

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.Playables;
 
-namespace Fluentplayableapi
+namespace FluentPlayableApi
 {
     /// <summary>
     /// Stores authored fluent graph paths and named input indices.

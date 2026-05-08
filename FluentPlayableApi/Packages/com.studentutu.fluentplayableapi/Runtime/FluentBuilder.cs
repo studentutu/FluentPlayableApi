@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-namespace Fluentplayableapi
+namespace FluentPlayableApi
 {
     /// <summary>
     /// Declares, connects, names, and verifies Unity playables through a compact fluent API.
@@ -73,8 +73,24 @@ namespace Fluentplayableapi
             }
 
             output = AnimationPlayableOutput.Create(Graph, name, animator);
-            _authoredOutputs.Add(output.GetHandle());
-            InvalidateVerification();
+            RegisterOutput(output);
+            return this;
+        }
+
+        /// <summary>
+        /// Creates a playable output through a caller-provided factory and registers it for verification.
+        /// </summary>
+        public FluentBuilder Output<TOutput>(Func<PlayableGraph, TOutput> factory, out TOutput output)
+            where TOutput : struct, IPlayableOutput
+        {
+            EnsureNotDisposed();
+            if (factory == null)
+            {
+                throw new ArgumentNullException(nameof(factory));
+            }
+
+            output = factory(Graph);
+            RegisterOutput(output);
             return this;
         }
 
@@ -82,6 +98,15 @@ namespace Fluentplayableapi
         /// Declares the next playable as the source for an animation output.
         /// </summary>
         public FluentBuilder Input(AnimationPlayableOutput output, int sourceOutputPort = 0)
+        {
+            return Input<AnimationPlayableOutput>(output, sourceOutputPort);
+        }
+
+        /// <summary>
+        /// Declares the next playable as the source for a playable output.
+        /// </summary>
+        public FluentBuilder Input<TOutput>(TOutput output, int sourceOutputPort = 0)
+            where TOutput : struct, IPlayableOutput
         {
             EnsureNotDisposed();
             DeclareOutputInput(output, sourceOutputPort);
@@ -302,11 +327,8 @@ namespace Fluentplayableapi
         /// <summary>
         /// Verifies fluent declarations and returns the authored graph without starting playback.
         /// </summary>
-        public PlayableGraph Verify(bool skipVerification = false)
+        public PlayableGraph Verify()
         {
-            if (skipVerification)
-                return Graph;
-
             EnsureNotDisposed();
             VerifyDeclarations();
             _verified = true;
@@ -414,13 +436,11 @@ namespace Fluentplayableapi
             _registry.EnsureNodePathAvailable(nodePath);
         }
 
-        internal void DeclareOutputInput(AnimationPlayableOutput output, int sourceOutputPort)
+        internal void DeclareOutputInput<TOutput>(TOutput output, int sourceOutputPort)
+            where TOutput : struct, IPlayableOutput
         {
             EnsureNotDisposed();
-            if (!output.IsOutputValid())
-            {
-                throw new ArgumentException("Output must be valid.", nameof(output));
-            }
+            EnsureValidOutput(output, nameof(output));
 
             if (sourceOutputPort < 0)
             {
@@ -439,6 +459,14 @@ namespace Fluentplayableapi
             var declaredInput = new DeclaredInput();
             _declaredInputs.Add(declaredInput);
             _pendingInput = PendingInput.ForOutput(output, sourceOutputPort, declaredInput);
+        }
+
+        private void RegisterOutput<TOutput>(TOutput output)
+            where TOutput : struct, IPlayableOutput
+        {
+            EnsureValidOutput(output, nameof(output));
+            _authoredOutputs.Add(output.GetHandle());
+            InvalidateVerification();
         }
 
         internal void DeclarePlayableInput<TDestination>(TDestination destination, int index, string? name)
@@ -652,6 +680,15 @@ namespace Fluentplayableapi
             if (!playable.IsValid())
             {
                 throw new ArgumentException("Playable must be valid.", parameterName);
+            }
+        }
+
+        private static void EnsureValidOutput<TOutput>(TOutput output, string parameterName)
+            where TOutput : struct, IPlayableOutput
+        {
+            if (!output.IsOutputValid())
+            {
+                throw new ArgumentException("Output must be valid.", parameterName);
             }
         }
 

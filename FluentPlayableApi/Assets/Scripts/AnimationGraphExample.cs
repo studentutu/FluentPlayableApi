@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Fluentplayableapi;
+using FluentPlayableApi;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -16,7 +16,7 @@ public class AnimationGraphExample : MonoBehaviour
     [SerializeField] private AvatarMask UpperBodyMask;
     [SerializeField] private Animator _animator;
 
-    public float ManualTime;
+    public float ManualDeltaTime = 1f / 60f;
     public bool Manual = false;
     public bool RecreateGraph = false;
 
@@ -37,10 +37,9 @@ public class AnimationGraphExample : MonoBehaviour
         Recreate();
     }
 
-    // Update is called once per frame
     private void Recreate()
     {
-        OnDestroy();
+        DisposeGraph();
 
         if (_animator == null)
             return;
@@ -48,7 +47,8 @@ public class AnimationGraphExample : MonoBehaviour
         if (Locomotion == null)
             return;
         
-        // Same PlayableGraph under the hood.
+        int upperBodyClipCount = CountValidClips(UpperBody);
+
         _builder = FluentBuilder.Create("AnimationGraphExample")
             .Output(_animator, out var output)
             .Input(output)
@@ -64,8 +64,8 @@ public class AnimationGraphExample : MonoBehaviour
                 .WithWeight(rootWithLocomotionMixer, "Locomotion", 1f)
 
                 .Input(rootWithLocomotionMixer, 1, "UpperBodySlot")
-                .WithMixer<AnimationMixerPlayable>(CountValidClips(UpperBody), out var upperBodySlot, "UpperBodySlot")
-                .WithWeight(rootWithLocomotionMixer, "UpperBodySlot", 1f)
+                .WithMixer<AnimationMixerPlayable>(upperBodyClipCount, out var upperBodySlot, "UpperBodySlot")
+                .WithWeight(rootWithLocomotionMixer, "UpperBodySlot", upperBodyClipCount > 0 ? 1f : 0f)
                 .Layer(rootWithLocomotionMixer, 0)
                 .Layer(rootWithLocomotionMixer, 1, additive: true, mask: UpperBodyMask)
 
@@ -73,6 +73,7 @@ public class AnimationGraphExample : MonoBehaviour
             .WithMixer<AnimationMixerPlayable>(CountValidClips(FullBody), out var fullBodySlot, "FullBodySlot")
             .WithWeight(rootWithFullBodyMixer, "FullBodySlot", 0f);
 
+        // Link/consume/modify.
         AddClipsToSlot(_builder, upperBodySlot, UpperBody, "UpperBody", PickRandomValidClipIndex(UpperBody));
         AddClipsToSlot(_builder, fullBodySlot, FullBody, "FullBody", enabledInput: -1);
 
@@ -81,7 +82,17 @@ public class AnimationGraphExample : MonoBehaviour
             _graph.Play();
     }
 
+    private void OnDisable()
+    {
+        DisposeGraph();
+    }
+
     private void OnDestroy()
+    {
+        DisposeGraph();
+    }
+
+    private void DisposeGraph()
     {
         if (_builder != null)
         {
@@ -89,10 +100,11 @@ public class AnimationGraphExample : MonoBehaviour
             _builder = null;
         }
 
-        if(!_graph.IsValid())
+        if (!_graph.IsValid())
             return;
-        
+
         _graph.Destroy();
+        _graph = default;
     }
 
     private void Update()
@@ -100,12 +112,15 @@ public class AnimationGraphExample : MonoBehaviour
         if (!Manual)
             return;
 
-        RefreshGraph(Time.deltaTime);
+        RefreshGraph(ManualDeltaTime);
     }
 
     private void RefreshGraph(float delta)
     {
         if (!_graph.IsValid())
+            return;
+
+        if (delta <= 0f)
             return;
         
         _graph.Evaluate(delta);

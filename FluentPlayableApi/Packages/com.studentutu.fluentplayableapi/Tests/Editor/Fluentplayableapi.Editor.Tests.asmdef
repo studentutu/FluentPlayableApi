@@ -1,10 +1,10 @@
 {
-    "name": "Fluentplayableapi.Editor.Tests",
+    "name": "FluentPlayableApi.Editor.Tests",
     "rootNamespace": "",
     "references": [
+        "FluentPlayableApi",
         "UnityEngine.TestRunner",
-        "UnityEditor.TestRunner",
-        "Fluentplayableapi"
+        "UnityEditor.TestRunner"
     ],
     "includePlatforms": [
         "Editor"

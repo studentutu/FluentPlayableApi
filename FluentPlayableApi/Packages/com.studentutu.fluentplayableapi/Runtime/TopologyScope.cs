@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-namespace Fluentplayableapi
+namespace FluentPlayableApi
 {
     /// <summary>
     /// Declares nodes under one fluent topology path.
@@ -40,6 +40,15 @@ namespace Fluentplayableapi
         /// Declares the next playable as the source for an animation output.
         /// </summary>
         public TopologyScope Input(AnimationPlayableOutput output, int sourceOutputPort = 0)
+        {
+            return Input<AnimationPlayableOutput>(output, sourceOutputPort);
+        }
+
+        /// <summary>
+        /// Declares the next playable as the source for a playable output.
+        /// </summary>
+        public TopologyScope Input<TOutput>(TOutput output, int sourceOutputPort = 0)
+            where TOutput : struct, IPlayableOutput
         {
             _builder.DeclareOutputInput(output, sourceOutputPort);
             return this;

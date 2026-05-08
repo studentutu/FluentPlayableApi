@@ -22,7 +22,9 @@ It addresses a current issue with Unity graph authoring problem: Unity provides 
 Playable API keeps topology visible and maintainable in code.
 
 The API is intentionally small. It does not replace Unity's graph types, own
-graph lifetime, or add project-specific animation concepts.
+graph lifetime, or add project-specific animation concepts. The core fluent
+edge model works with any Unity `IPlayable` and `IPlayableOutput`; animation
+helpers are convenience API only.
 
 Fluent API for playable graph helps to read, maintain and quickly change the topology.
 
@@ -75,7 +77,7 @@ Replace `../path-to-cloned-repo` with the actual relative path from your Unity p
 ## Core Use
 
 ```csharp
-using Fluentplayableapi;
+using FluentPlayableApi;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -115,6 +117,7 @@ builder.Dispose();
 ```csharp
 FluentBuilder.Create("Name of graph")
 FluentBuilder.Create(existingGraph)
+.Output(factory, out output)
 ```
 
 `Create(existingGraph)` reuses the graph instance only. It does not clear graph
@@ -130,10 +133,12 @@ instance. It does not destroy, stop, or otherwise own the `PlayableGraph`.
 
 ```csharp
 .Output(animator, out output, name = "AnimationOutput")
+.Output(factory, out output)
 
 .Scope(path)
 
 .Input(output, sourceOutputPort = 0)
+.Input<TOutput>(output, sourceOutputPort = 0)
 .Input(playable, index, name = null)
 .AddInput(playable, name, out index)
 
@@ -198,7 +203,7 @@ Pass `paused: false` to start an individual clip playable in the playing state:
 Project-specific clip configuration, such as speed or duration behavior, should
 be applied by project code after creation.
 
-### Arbitrary Playables
+### Arbitrary Playables And Outputs
 
 Use the factory overload for Unity playables that are outside the core mixer and
 clip helpers:
@@ -207,8 +212,27 @@ clip helpers:
 .WithPlayable(
   graph => AnimationScriptPlayable.Create(graph, job, inputCount: 2),
   out var applyAdditive,
-  name: "ApplyAdditive")
+    name: "ApplyAdditive")
 ```
+
+Use the output factory for non-animation outputs or custom output creation:
+
+```csharp
+.Output(
+  graph => AudioPlayableOutput.Create(graph, "AudioOutput", audioSource),
+  out AudioPlayableOutput audioOutput)
+
+.Input(audioOutput)
+.WithPlayable(
+  graph => AudioMixerPlayable.Create(graph, 1),
+  out AudioMixerPlayable audioMixer,
+  name: "AudioMixer")
+```
+
+The same output-source declaration path works for `ScriptPlayableOutput`,
+`PlayableOutput`, and other Unity outputs that implement `IPlayableOutput`.
+Specialized target/user-data/output settings should stay in project code through
+Unity's native output API.
 
 Existing handles can be attached to a pending input:
 

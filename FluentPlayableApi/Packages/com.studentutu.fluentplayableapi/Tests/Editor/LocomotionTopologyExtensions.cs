@@ -2,11 +2,11 @@
 
 using System;
 using System.Collections.Generic;
-using Fluentplayableapi;
+using FluentPlayableApi;
 using UnityEngine;
 using UnityEngine.Animations;
 
-namespace Fluentplayableapi.Tests
+namespace FluentPlayableApi.Tests
 {
     /// <summary>
     /// Example descriptor used by the locomotion topology extension.

@@ -1,9 +1,8 @@
 #nullable enable
 
-using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-namespace Fluentplayableapi
+namespace FluentPlayableApi
 {
     /// <summary>
     /// Tracks the destination waiting for the next authored playable.
@@ -21,9 +20,10 @@ namespace Fluentplayableapi
         public abstract PlayableHandle DestinationHandle { get; }
         public abstract int DestinationInput { get; }
 
-        public static PendingInput ForOutput(AnimationPlayableOutput output, int sourceOutputPort, DeclaredInput declaredInput)
+        public static PendingInput ForOutput<TOutput>(TOutput output, int sourceOutputPort, DeclaredInput declaredInput)
+            where TOutput : struct, IPlayableOutput
         {
-            return new OutputPendingInput(output, sourceOutputPort, declaredInput);
+            return new OutputPendingInput<TOutput>(output, sourceOutputPort, declaredInput);
         }
 
         public static PendingInput ForPlayable<TDestination>(TDestination destination, int destinationInput, DeclaredInput declaredInput)
@@ -35,11 +35,12 @@ namespace Fluentplayableapi
         public abstract bool Attach<TSource>(PlayableGraph graph, TSource source, int sourceOutputPort)
             where TSource : struct, IPlayable;
 
-        private sealed class OutputPendingInput : PendingInput
+        private sealed class OutputPendingInput<TOutput> : PendingInput
+            where TOutput : struct, IPlayableOutput
         {
-            private readonly AnimationPlayableOutput _output;
+            private readonly TOutput _output;
 
-            public OutputPendingInput(AnimationPlayableOutput output, int sourceOutputPort, DeclaredInput declaredInput)
+            public OutputPendingInput(TOutput output, int sourceOutputPort, DeclaredInput declaredInput)
                 : base(declaredInput)
             {
                 _output = output;

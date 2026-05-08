@@ -1,13 +1,13 @@
 #nullable enable
 
 using System.Collections.Generic;
-using Fluentplayableapi;
+using FluentPlayableApi;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
 
-namespace Fluentplayableapi.Tests
+namespace FluentPlayableApi.Tests
 {
     public sealed class LocomotionTopologyExtensionsTest
     {
